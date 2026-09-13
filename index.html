@@ -824,7 +824,7 @@ Facteurs protecteurs : ${val('riskProtective')}
 Notes : ${val('riskNotes')}
 
 ── MANIFESTATIONS SOMATIQUES DE L'ANXIÉTÉ ──
-Motif évalué : ${SOMA_DATA[currentSoma].label}
+Motif évalué : ${SD(currentSoma,'label')}
 Conclusion : ${document.getElementById('somaVerdict').textContent}
 
 ── PLAN DE SÉCURITÉ ──
