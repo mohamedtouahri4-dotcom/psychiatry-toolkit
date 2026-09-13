@@ -1,0 +1,20 @@
+{
+  "name": "Psychiatry Toolkit",
+  "short_name": "PsyToolkit",
+  "description": "Outil d'aide à la décision pour les urgences psychiatriques et l'évaluation clinique en médecine générale.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#EDF1EF",
+  "theme_color": "#22594D",
+  "lang": "fr",
+  "dir": "ltr",
+  "author": "Dr TOUAHRI Mohammed",
+  "contact": "mohammedtouahri42@gmail.com, +213 777 122 805",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

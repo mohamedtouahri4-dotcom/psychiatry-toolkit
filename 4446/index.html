@@ -1,0 +1,1787 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Psychiatry Toolkit</title>
+<meta name="author" content="Dr TOUAHRI Mohammed">
+<meta name="contact" content="mohammedtouahri42@gmail.com, +213 777 122 805">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#22594D">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PsyToolkit">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#152321;
+    --bg:#EDF1EF;
+    --panel:#FFFFFF;
+    --line:#CBD5D2;
+    --accent:#22594D;
+    --accent-dark:#153B33;
+    --accent-light:#3D8570;
+    --risk:#9C3226;
+    --risk-bg:#F7E9E7;
+    --muted:#3E4E4A;
+    --gold:#B4893F;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'IBM Plex Sans',sans-serif;
+    -webkit-tap-highlight-color:transparent;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+  }
+  h1,h2,h3{font-family:'IBM Plex Serif',serif;font-weight:600;margin:0;}
+  #app{flex:1;padding:20px 18px 90px;max-width:640px;margin:0 auto;width:100%;}
+  .topbar{
+    max-width:640px;margin:0 auto;width:100%;
+    padding:16px 18px 14px;
+    display:flex;align-items:center;gap:10px;justify-content:space-between;
+    border-bottom:1px solid var(--line);
+    background:var(--panel);
+    box-shadow:0 1px 0 rgba(21,35,33,0.03);
+    position:relative;z-index:2;
+  }
+  .brand{display:flex;align-items:center;gap:10px;}
+  .brand-mark{
+    width:34px;height:34px;border-radius:9px;
+    background:linear-gradient(160deg,var(--accent),var(--accent-dark));
+    display:flex;align-items:center;justify-content:center;
+    color:white;font-family:'IBM Plex Serif',serif;font-weight:600;font-size:15px;
+    box-shadow:0 2px 5px rgba(21,59,51,0.35);
+    flex-shrink:0;
+  }
+  .topbar h1{font-size:21px;letter-spacing:-0.2px;}
+  .topbar span{font-size:14px;color:var(--muted);}
+  .screen{display:none;}
+  .screen.active{display:block;animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+  .card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:16px 16px;
+    margin-bottom:12px;
+    box-shadow:0 1px 2px rgba(21,35,33,0.05), 0 3px 10px rgba(21,35,33,0.045);
+  }
+  .module-list .card{
+    display:flex;align-items:center;justify-content:space-between;
+    cursor:pointer;
+    border-left:3px solid var(--accent-light);
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .module-list .card:active{background:#F6F8F7;transform:scale(0.99);}
+  .module-list h3{font-size:19px;}
+  .module-list p{margin:4px 0 0;font-size:15.5px;color:var(--muted);}
+  .chev{color:var(--accent);font-size:23.5px;}
+
+  label{display:block;font-size:15.5px;font-weight:600;margin:16px 0 6px;color:var(--ink);}
+  label.first{margin-top:0;}
+  .hint{font-size:14px;color:var(--muted);margin-top:-3px;margin-bottom:6px;font-weight:400;}
+  input[type=text],input[type=date],textarea,select{
+    width:100%;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:10px 12px;
+    font-size:17.5px;
+    font-family:inherit;
+    background:#FCFDFD;
+    color:var(--ink);
+  }
+  textarea{min-height:64px;resize:vertical;}
+  input:focus,textarea:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px;}
+  input::placeholder,textarea::placeholder{color:#7C8B87;opacity:1;}
+
+  .choice-row{display:flex;flex-wrap:wrap;gap:8px;}
+  .choice{
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:8px 14px;
+    font-size:15.5px;
+    background:#FCFDFD;
+    cursor:pointer;
+    user-select:none;
+  }
+  .choice.selected{background:var(--accent);color:white;border-color:var(--accent);}
+  .choice.risk-selected{background:var(--risk);color:white;border-color:var(--risk);}
+
+  .risk-banner{
+    background:var(--risk-bg);
+    border:1px solid #E3C4BF;
+    border-radius:8px;
+    padding:10px 12px;
+    font-size:15.5px;
+    color:var(--risk);
+    margin-bottom:14px;
+    display:none;
+  }
+  .risk-banner.show{display:block;}
+
+  .section-title{
+    font-size:14px;text-transform:none;color:var(--accent-dark);
+    font-weight:600;margin:22px 0 4px;
+    border-bottom:1px solid var(--line);padding-bottom:6px;
+  }
+  .section-title.first{margin-top:4px;}
+
+  button{
+    font-family:inherit;font-size:16.5px;font-weight:600;
+    border-radius:8px;border:1px solid transparent;
+    padding:11px 16px;cursor:pointer;
+  }
+  .btn-primary{background:var(--accent);color:white;width:100%;margin-top:20px;}
+  .btn-primary:active{background:var(--accent-dark);}
+  .btn-secondary{background:transparent;border:1px solid var(--line);color:var(--ink);width:100%;margin-top:8px;}
+  .btn-ghost{background:transparent;color:var(--accent);border:none;padding:6px 0;font-size:15.5px;}
+
+  .back-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;cursor:pointer;}
+  .back-row span.arrow{font-size:21px;color:var(--accent);}
+  .back-row span.label{font-size:16.5px;color:var(--muted);}
+
+  .summary pre{
+    white-space:pre-wrap;font-family:'IBM Plex Sans',sans-serif;
+    font-size:16px;line-height:1.6;background:#FCFDFD;
+    border:1px solid var(--line);border-radius:8px;padding:14px;
+  }
+
+  nav.tabbar{
+    position:fixed;bottom:0;left:0;right:0;
+    background:var(--panel);border-top:1px solid var(--line);
+    display:flex;justify-content:space-around;
+    padding:8px 6px calc(8px + env(safe-area-inset-bottom));
+  }
+  nav.tabbar .tab{
+    display:flex;flex-direction:column;align-items:center;gap:2px;
+    font-size:13px;color:var(--muted);cursor:pointer;flex:1;
+  }
+  nav.tabbar .tab .dot{width:6px;height:6px;border-radius:50%;background:transparent;margin-bottom:2px;}
+  nav.tabbar .tab.active{color:var(--accent-dark);font-weight:600;}
+  nav.tabbar .tab.active .dot{background:var(--accent);}
+
+  .subtype-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;}
+  .subtype{
+    border:1px solid var(--line);border-radius:20px;padding:9px 14px;
+    font-size:15.5px;background:#FCFDFD;cursor:pointer;
+  }
+  .subtype.selected{background:var(--accent-dark);color:white;border-color:var(--accent-dark);}
+
+  .check-item{
+    display:flex;align-items:flex-start;gap:10px;
+    padding:11px 0;border-bottom:1px solid var(--line);
+    cursor:pointer;
+  }
+  .check-item:last-child{border-bottom:none;}
+  .check-item input{margin-top:3px;width:18px;height:18px;accent-color:var(--accent);flex-shrink:0;}
+  .check-item.redflag input{accent-color:var(--risk);}
+  .check-item span{font-size:16.5px;line-height:1.4;}
+
+  .verdict{
+    margin-top:18px;border-radius:10px;padding:14px 16px;
+    font-size:16.5px;font-weight:600;line-height:1.5;
+  }
+  .verdict.v-organic{background:var(--risk-bg);color:var(--risk);border:1px solid #E3C4BF;}
+  .verdict.v-functional{background:#E7F0EC;color:var(--accent-dark);border:1px solid #BFDBCF;}
+  .verdict.v-unclear{background:#F1EFE7;color:#7A6A3D;border:1px solid #E2D9BE;}
+
+  .verdict.v-orange{background:#FBEEDD;color:#8A5A12;border:1px solid #EFD1A0;}
+
+  .wizard-progress{font-size:14px;color:var(--muted);margin-bottom:6px;font-weight:600;}
+  .wizard-track{height:4px;background:var(--line);border-radius:2px;margin-bottom:18px;overflow:hidden;}
+  .wizard-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .25s ease;}
+  .wizard-nav{display:flex;gap:10px;margin-top:22px;}
+  .wizard-nav button{margin-top:0;flex:1;}
+
+  .vital-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .vital-grid label{margin:0 0 4px;}
+
+  .physio-row{
+    border:1px solid var(--line);border-radius:8px;
+    padding:12px;margin-bottom:10px;
+  }
+  .physio-row .physio-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+  .physio-row .physio-head strong{font-size:16.5px;}
+
+  html[dir="rtl"] body{font-family:'IBM Plex Sans Arabic','IBM Plex Sans',sans-serif;}
+  html[dir="rtl"] .back-row .arrow{transform:scaleX(-1);}
+  html[dir="rtl"] .chev{transform:scaleX(-1);}
+  html[dir="rtl"] .module-list .card{border-left:none;border-right:3px solid var(--accent-light);}
+  html[dir="rtl"] .brand{flex-direction:row-reverse;}
+
+  @media print{
+    nav.tabbar,.topbar,.btn-primary,.btn-secondary,.back-row{display:none !important;}
+    .screen{display:block !important;}
+    body{background:white;}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-mark">PT</div>
+    <h1 data-i18n="appName">Psychiatry Toolkit</h1>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <div id="langSwitch" style="display:flex;gap:4px;background:#EDF1EF;border:1px solid var(--line);border-radius:8px;padding:2px;">
+      <button type="button" data-lang="fr" onclick="setLang('fr')" style="border:none;background:transparent;font-size:11px;font-weight:600;padding:4px 7px;border-radius:6px;cursor:pointer;">FR</button>
+      <button type="button" data-lang="en" onclick="setLang('en')" style="border:none;background:transparent;font-size:11px;font-weight:600;padding:4px 7px;border-radius:6px;cursor:pointer;">EN</button>
+      <button type="button" data-lang="ar" onclick="setLang('ar')" style="border:none;background:transparent;font-size:11px;font-weight:600;padding:4px 7px;border-radius:6px;cursor:pointer;">ع</button>
+    </div>
+    <span id="patientTag" data-i18n="newRecord">nouveau dossier</span>
+  </div>
+</div>
+
+<div id="app">
+
+  <!-- DASHBOARD -->
+  <div class="screen active" id="screen-home">
+    <div class="section-title first" data-i18n="sessionIdTitle">Identifiant de séance (non nominatif recommandé)</div>
+    <div class="card">
+      <label class="first" data-i18n="refLabel">Référence dossier</label>
+      <div class="hint" data-i18n="refHint">Utilisez un code, pas le nom complet du patient.</div>
+      <input type="text" id="patientRef" placeholder="ex : PT-0231">
+    </div>
+
+    <div class="section-title" data-i18n="emergenciesTitle">Urgences psychiatriques</div>
+    <div class="module-list">
+      <div class="card" onclick="goTo('urgence')" style="border-color:#E3C4BF;">
+        <div><h3 data-i18n="emergenciesCardTitle">🔴 Urgences psychiatriques</h3><p data-i18n="emergenciesCardDesc">Accès direct — psychose puerpérale, refus alimentaire, sevrage, etc.</p></div>
+        <span class="chev">›</span>
+      </div>
+    </div>
+
+    <div class="section-title" data-i18n="modulesTitle">Modules</div>
+    <div class="module-list">
+      <div class="card" onclick="goTo('risk')">
+        <div><h3 data-i18n="riskCardTitle">Évaluation du risque suicidaire</h3><p data-i18n="riskCardDesc">Idéation, intention, plan, moyens, facteurs</p></div>
+        <span class="chev">›</span>
+      </div>
+      <div class="card" onclick="goTo('mse')">
+        <div><h3 data-i18n="mseCardTitle">Examen de l'état mental (MSE)</h3><p data-i18n="mseCardDesc">Présentation, discours, pensée, cognition</p></div>
+        <span class="chev">›</span>
+      </div>
+      <div class="card" onclick="goTo('safety')">
+        <div><h3 data-i18n="safetyCardTitle">Plan de sécurité</h3><p data-i18n="safetyCardDesc">Signaux d'alerte, stratégies, contacts</p></div>
+        <span class="chev">›</span>
+      </div>
+      <div class="card" onclick="goTo('soma')">
+        <div><h3 data-i18n="somaCardTitle">Manifestations somatiques de l'anxiété</h3><p data-i18n="somaCardDesc">Côlon irritable, palpitations, dermatose, céphalées, vertiges, fatigue, anxiété générale</p></div>
+        <span class="chev">›</span>
+      </div>
+      <div class="card" onclick="goTo('summary')">
+        <div><h3 data-i18n="summaryCardTitle">Résumé & export</h3><p data-i18n="summaryCardDesc">Compiler les modules en note clinique</p></div>
+        <span class="chev">›</span>
+      </div>
+    </div>
+
+    <p style="text-align:center;font-size:13px;color:var(--muted);margin-top:28px;">
+      © 2026 Dr TOUAHRI Mohammed<br>
+      mohammedtouahri42@gmail.com · +213 777 122 805
+    </p>
+  </div>
+
+  <!-- RISK MODULE -->
+  <div class="screen" id="screen-risk">
+    <div class="back-row" onclick="goTo('home')"><span class="arrow">‹</span><span class="label" data-i18n="home">Accueil</span></div>
+    <h2 data-i18n="riskCardTitle">Évaluation du risque suicidaire</h2>
+    <div class="risk-banner" id="riskBanner" data-i18n="riskBannerText">Éléments à haut risque cochés — envisager une évaluation immédiate et la sécurisation des moyens létaux, conformément à votre protocole local.</div>
+
+    <label class="first" data-i18n="riskIdeationLabel">Idéation suicidaire actuelle</label>
+    <div class="choice-row" data-group="ideation">
+      <div class="choice" data-value="none" data-i18n="risk_ideation_none">Absente</div>
+      <div class="choice" data-value="passive" data-i18n="risk_ideation_passive">Passive</div>
+      <div class="choice" data-value="active_noplan" data-risk="true" data-i18n="risk_ideation_active_noplan">Active sans plan</div>
+      <div class="choice" data-value="active_plan" data-risk="true" data-i18n="risk_ideation_active_plan">Active avec plan</div>
+    </div>
+
+    <label data-i18n="riskIntentionLabel">Intention</label>
+    <div class="choice-row" data-group="intention">
+      <div class="choice" data-value="none" data-i18n="risk_intention_none">Aucune</div>
+      <div class="choice" data-value="ambivalent" data-i18n="risk_intention_ambivalent">Ambivalente</div>
+      <div class="choice" data-value="present" data-risk="true" data-i18n="risk_intention_present">Présente</div>
+    </div>
+
+    <label data-i18n="riskMeansLabel">Accès à des moyens létaux</label>
+    <div class="choice-row" data-group="means">
+      <div class="choice" data-value="no" data-i18n="risk_means_no">Non</div>
+      <div class="choice" data-value="possible" data-i18n="risk_means_possible">Possible</div>
+      <div class="choice" data-value="direct" data-risk="true" data-i18n="risk_means_direct">Direct</div>
+    </div>
+
+    <label data-i18n="riskHistoryLabel">Antécédents de tentative</label>
+    <div class="choice-row" data-group="history">
+      <div class="choice" data-value="none" data-i18n="risk_history_none">Aucun</div>
+      <div class="choice" data-value="old" data-i18n="risk_history_old">Ancien (&gt;1 an)</div>
+      <div class="choice" data-value="recent" data-risk="true" data-i18n="risk_history_recent">Récent (&lt;1 an)</div>
+    </div>
+
+    <label class="first" data-i18n="riskProtectiveLabel">Facteurs protecteurs identifiés</label>
+    <div class="choice-row" id="riskProtectiveChips">
+      <div class="choice" data-value="entourage" data-i18n="risk_protective_entourage">Entourage présent</div>
+      <div class="choice" data-value="enfants" data-i18n="risk_protective_enfants">Enfants à charge</div>
+      <div class="choice" data-value="croyances" data-i18n="risk_protective_croyances">Croyances religieuses</div>
+      <div class="choice" data-value="suivi" data-i18n="risk_protective_suivi">Suivi psychiatrique en cours</div>
+      <div class="choice" data-value="projets" data-i18n="risk_protective_projets">Projets à court terme</div>
+      <div class="choice" data-value="aucun" data-i18n="risk_protective_aucun">Aucun identifié</div>
+    </div>
+    <label data-i18n="wPrecisions">Précisions</label>
+    <textarea id="riskProtective" data-i18n-placeholder="detailsPlaceholder" placeholder="Détails"></textarea>
+
+    <label data-i18n="riskNotesLabel">Notes cliniques</label>
+    <textarea id="riskNotes" data-i18n-placeholder="freeObservations" placeholder="Observations libres"></textarea>
+
+    <button class="btn-primary" onclick="goTo('home')" data-i18n="saveReturn">Enregistrer et revenir</button>
+  </div>
+
+  <!-- MSE MODULE -->
+  <div class="screen" id="screen-mse">
+    <div class="back-row" onclick="goTo('home')"><span class="arrow">‹</span><span class="label" data-i18n="home">Accueil</span></div>
+    <h2 data-i18n="mseCardTitleFull">Examen de l'état mental</h2>
+
+    <label class="first" data-i18n="mseAppearanceLabel">Présentation générale</label>
+    <textarea id="mseAppearance" data-i18n-placeholder="mseAppearancePh" placeholder="Hygiène, contact visuel, comportement"></textarea>
+
+    <label data-i18n="mseSpeechLabel">Discours</label>
+    <div class="choice-row" data-group="speech">
+      <div class="choice" data-value="normal" data-i18n="mse_speech_normal">Normal</div>
+      <div class="choice" data-value="slow" data-i18n="mse_speech_slow">Ralenti</div>
+      <div class="choice" data-value="fast" data-i18n="mse_speech_fast">Accéléré</div>
+      <div class="choice" data-value="poor" data-i18n="mse_speech_poor">Pauvre</div>
+    </div>
+
+    <label data-i18n="mseMoodLabel">Humeur rapportée</label>
+    <input type="text" id="mseMood" data-i18n-placeholder="mseMoodPh" placeholder="Dans les mots du patient">
+
+    <label data-i18n="mseAffectLabel">Affect observé</label>
+    <div class="choice-row" data-group="affect">
+      <div class="choice" data-value="congruent" data-i18n="mse_affect_congruent">Congruent</div>
+      <div class="choice" data-value="incongruent" data-i18n="mse_affect_incongruent">Incongruent</div>
+      <div class="choice" data-value="blunted" data-i18n="mse_affect_blunted">Émoussé</div>
+      <div class="choice" data-value="labile" data-i18n="mse_affect_labile">Labile</div>
+    </div>
+
+    <label data-i18n="mseThoughtLabel">Cours de la pensée</label>
+    <textarea id="mseThought" data-i18n-placeholder="mseThoughtPh" placeholder="Cohérent, tangentiel, coq-à-l'âne, fuite des idées…"></textarea>
+
+    <label data-i18n="mseContentLabel">Contenu de la pensée</label>
+    <textarea id="mseContent" data-i18n-placeholder="mseContentPh" placeholder="Idées délirantes, obsessions, préoccupations"></textarea>
+
+    <label data-i18n="msePerceptionLabel">Perceptions</label>
+    <div class="choice-row" data-group="perception">
+      <div class="choice" data-value="none" data-i18n="mse_perception_none">Aucune anomalie</div>
+      <div class="choice" data-value="hallucinations" data-i18n="mse_perception_hallucinations">Hallucinations rapportées</div>
+    </div>
+
+    <label data-i18n="mseCognitionLabel">Cognition / orientation</label>
+    <textarea id="mseCognition" data-i18n-placeholder="mseCognitionPh" placeholder="Temps, espace, personne, attention, mémoire"></textarea>
+
+    <label data-i18n="mseInsightLabel">Insight et jugement</label>
+    <textarea id="mseInsight" placeholder=""></textarea>
+
+    <button class="btn-primary" onclick="goTo('home')" data-i18n="saveReturn">Enregistrer et revenir</button>
+  </div>
+
+  <!-- SAFETY PLAN -->
+  <div class="screen" id="screen-safety">
+    <div class="back-row" onclick="goTo('home')"><span class="arrow">‹</span><span class="label" data-i18n="home">Accueil</span></div>
+    <h2 data-i18n="safetyCardTitle">Plan de sécurité</h2>
+
+    <label class="first" data-i18n="spWarningLabel">Signaux d'alerte personnels</label>
+    <div class="choice-row" id="spWarningChips">
+      <div class="choice" data-value="isolement" data-i18n="sp_warning_isolement">Isolement croissant</div>
+      <div class="choice" data-value="idees_noires" data-i18n="sp_warning_idees">Verbalisation d'idées noires</div>
+      <div class="choice" data-value="dons" data-i18n="sp_warning_dons">Don d'objets personnels</div>
+      <div class="choice" data-value="substances" data-i18n="sp_warning_substances">Consommation accrue d'alcool/substances</div>
+      <div class="choice" data-value="sommeil" data-i18n="sp_warning_sommeil">Troubles du sommeil marqués</div>
+    </div>
+    <label data-i18n="wPrecisions">Précisions</label>
+    <textarea id="spWarning" data-i18n-placeholder="spWarningPh" placeholder="Pensées, situations ou émotions annonciatrices"></textarea>
+
+    <label data-i18n="spCopingLabel">Stratégies d'adaptation autonomes</label>
+    <div class="choice-row" id="spCopingChips">
+      <div class="choice" data-value="respiration" data-i18n="sp_coping_respiration">Respiration / relaxation</div>
+      <div class="choice" data-value="sport" data-i18n="sp_coping_sport">Activité physique</div>
+      <div class="choice" data-value="contact" data-i18n="sp_coping_contact">Contact avec un proche</div>
+      <div class="choice" data-value="ecriture" data-i18n="sp_coping_ecriture">Écriture / journal</div>
+      <div class="choice" data-value="activite" data-i18n="sp_coping_activite">Activité plaisante habituelle</div>
+    </div>
+    <label data-i18n="wPrecisions">Précisions</label>
+    <textarea id="spCoping" data-i18n-placeholder="spCopingPh" placeholder="Ce que le patient peut faire seul"></textarea>
+
+    <label class="first" data-i18n="spDistractionLabel">Personnes et lieux qui apaisent</label>
+    <div class="choice-row" id="spDistractionChips">
+      <div class="choice" data-value="famille" data-i18n="sp_distraction_famille">Famille</div>
+      <div class="choice" data-value="amis" data-i18n="sp_distraction_amis">Amis proches</div>
+      <div class="choice" data-value="culte" data-i18n="sp_distraction_culte">Lieu de culte</div>
+      <div class="choice" data-value="nature" data-i18n="sp_distraction_nature">Nature / extérieur</div>
+      <div class="choice" data-value="creativite" data-i18n="sp_distraction_creativite">Activité créative</div>
+    </div>
+    <label data-i18n="wPrecisions">Précisions</label>
+    <textarea id="spDistraction" placeholder=""></textarea>
+
+    <label data-i18n="spContactsLabel">Personnes de confiance à contacter</label>
+    <textarea id="spContacts" data-i18n-placeholder="spContactsPh" placeholder="Nom + lien (à compléter avec les numéros locaux)"></textarea>
+
+    <label data-i18n="spEmergencyLabel">Contact professionnel / urgence</label>
+    <div class="hint" data-i18n="spEmergencyHint">Renseignez ici les numéros d'urgence réels de votre pays d'exercice — aucun numéro n'est pré-rempli par défaut.</div>
+    <textarea id="spEmergency" data-i18n-placeholder="spEmergencyPh" placeholder="Ligne d'urgence, service, numéro"></textarea>
+
+    <label data-i18n="spMeansLabel">Sécurisation de l'environnement</label>
+    <textarea id="spMeans" data-i18n-placeholder="spMeansPh" placeholder="Retrait ou limitation d'accès aux moyens létaux"></textarea>
+
+    <button class="btn-primary" onclick="goTo('home')" data-i18n="saveReturn">Enregistrer et revenir</button>
+  </div>
+
+  <!-- SOMATIC ANXIETY MODULE -->
+  <div class="screen" id="screen-soma">
+    <div class="back-row" onclick="goTo('home')"><span class="arrow">‹</span><span class="label" data-i18n="home">Accueil</span></div>
+    <h2 data-i18n="somaCardTitle">Manifestations somatiques de l'anxiété</h2>
+    <p class="hint" style="margin:6px 0 16px;" data-i18n="somaHint">Cochez ce qui est présent. Le verdict se met à jour automatiquement.</p>
+
+    <div class="subtype-row" id="somaSubtypes">
+      <div class="subtype selected" data-subtype="colon" data-i18n="soma_colon">Côlon irritable</div>
+      <div class="subtype" data-subtype="palpitations" data-i18n="soma_palpitations">Palpitations</div>
+      <div class="subtype" data-subtype="dermato" data-i18n="soma_dermato">Dermatose</div>
+      <div class="subtype" data-subtype="anxiete" data-i18n="soma_anxiete">Anxiété générale</div>
+      <div class="subtype" data-subtype="cephalees" data-i18n="soma_cephalees">Céphalées de tension</div>
+      <div class="subtype" data-subtype="vertiges" data-i18n="soma_vertiges">Vertiges psychogènes</div>
+      <div class="subtype" data-subtype="fatigue" data-i18n="soma_fatigue">Fatigue chronique</div>
+    </div>
+
+    <div class="section-title first" id="somaRedFlagTitle" data-i18n="somaRedFlagTitle">Drapeaux rouges — orientent vers l'organique</div>
+    <div class="card" id="somaRedFlags"></div>
+
+    <div class="section-title">En faveur du fonctionnel / psychogène</div>
+    <div class="card" id="somaFunctional"></div>
+
+    <div class="verdict v-unclear" id="somaVerdict">Cochez au moins un élément pour obtenir une orientation.</div>
+
+    <button class="btn-secondary" onclick="goTo('summary')" style="margin-top:18px;">Voir dans le résumé</button>
+  </div>
+
+  <!-- PSYCHIATRIC EMERGENCIES WIZARD -->
+  <div class="screen" id="screen-urgence">
+    <div class="back-row" onclick="goTo('home')"><span class="arrow">‹</span><span class="label" data-i18n="home">Accueil</span></div>
+    <div class="wizard-progress" id="wizardProgress">Étape 1/8</div>
+    <div class="wizard-track"><div class="wizard-fill" id="wizardFill" style="width:12.5%"></div></div>
+    <h2 id="wizardTitle"></h2>
+    <div id="wizardBody"></div>
+    <div class="wizard-nav">
+      <button class="btn-secondary" id="wizardPrev" onclick="wizardMove(-1)">Précédent</button>
+      <button class="btn-primary" id="wizardNext" onclick="wizardMove(1)">Suivant</button>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="screen" id="screen-summary">
+    <div class="back-row" onclick="goTo('home')"><span class="arrow">‹</span><span class="label" data-i18n="home">Accueil</span></div>
+    <h2 data-i18n="summaryScreenTitle">Résumé de séance</h2>
+    <p class="hint" style="margin-bottom:14px;" data-i18n="summaryHint">Ce résumé compile les modules remplis. Relisez-le avant de l'intégrer au dossier officiel du patient — cet outil ne remplace pas le dossier médical.</p>
+    <div class="card summary"><pre id="summaryText">Aucune donnée saisie pour l'instant.</pre></div>
+    <button class="btn-secondary" onclick="resumeUrgence()" data-i18n="resumeBtn">◀ Revenir corriger le parcours Urgence</button>
+    <button class="btn-primary" onclick="window.print()" data-i18n="printBtn">Imprimer / enregistrer en PDF</button>
+    <button class="btn-secondary" onclick="exportJSON()" data-i18n="exportBtn">Exporter les données (.json)</button>
+    <label class="first" style="margin-top:18px;" data-i18n="importLabel">Importer une séance sauvegardée</label>
+    <input type="file" id="importFile" accept="application/json" onchange="importJSON(event)">
+  </div>
+
+</div>
+
+<nav class="tabbar">
+  <div class="tab active" data-screen="home" onclick="goTo('home')"><div class="dot"></div><span data-i18n="home">Accueil</span></div>
+  <div class="tab" data-screen="risk" onclick="goTo('risk')"><div class="dot"></div><span data-i18n="tabRisk">Risque</span></div>
+  <div class="tab" data-screen="mse" onclick="goTo('mse')"><div class="dot"></div><span data-i18n="tabMse">MSE</span></div>
+  <div class="tab" data-screen="safety" onclick="goTo('safety')"><div class="dot"></div><span data-i18n="tabSafety">Sécurité</span></div>
+  <div class="tab" data-screen="summary" onclick="goTo('summary')"><div class="dot"></div><span data-i18n="tabSummary">Résumé</span></div>
+</nav>
+
+<script>
+// ---- i18n: interface strings (clinical content is translated separately, module by module) ----
+let currentLang = 'fr';
+const UI_STRINGS = {
+  fr: {
+    appName:"Psychiatry Toolkit", newRecord:"nouveau dossier",
+    sessionIdTitle:"Identifiant de séance (non nominatif recommandé)",
+    refLabel:"Référence dossier", refHint:"Utilisez un code, pas le nom complet du patient.",
+    emergenciesTitle:"Urgences psychiatriques", emergenciesCardTitle:"🔴 Urgences psychiatriques",
+    emergenciesCardDesc:"Accès direct — psychose puerpérale, refus alimentaire, sevrage, etc.",
+    modulesTitle:"Modules",
+    riskCardTitle:"Évaluation du risque suicidaire", riskCardDesc:"Idéation, intention, plan, moyens, facteurs",
+    mseCardTitle:"Examen de l'état mental (MSE)", mseCardTitleFull:"Examen de l'état mental", mseCardDesc:"Présentation, discours, pensée, cognition",
+    safetyCardTitle:"Plan de sécurité", safetyCardDesc:"Signaux d'alerte, stratégies, contacts",
+    somaCardTitle:"Manifestations somatiques de l'anxiété", somaCardDesc:"Côlon irritable, palpitations, dermatose, céphalées, vertiges, fatigue, anxiété générale",
+    summaryCardTitle:"Résumé & export", summaryCardDesc:"Compiler les modules en note clinique",
+    summaryScreenTitle:"Résumé de séance",
+    home:"Accueil", tabRisk:"Risque", tabMse:"MSE", tabSafety:"Sécurité", tabSummary:"Résumé",
+    saveReturn:"Enregistrer et revenir",
+    summaryHint:"Ce résumé compile les modules remplis. Relisez-le avant de l'intégrer au dossier officiel du patient — cet outil ne remplace pas le dossier médical.",
+    resumeBtn:"◀ Revenir corriger le parcours Urgence",
+    printBtn:"Imprimer / enregistrer en PDF", exportBtn:"Exporter les données (.json)", importLabel:"Importer une séance sauvegardée",
+    wPrev:"Précédent", wNext:"Suivant", wNextLast:"Voir le résumé",
+    wStep1:"Identification & motif", wStep2:"Antécédents & histoire", wStep3:"Examen clinique", wStep4:"Spécificités du trouble suspecté", wStep5:"Synthèse & conduite",
+    wAge:"Âge", wProfession:"Profession", wSexe:"Sexe", wSituation:"Situation familiale",
+    wMotif:"Motif de consultation", wPrecisions:"Précisions",
+    wAtcdPsyIndiv:"Antécédents psychiatriques individuels", wAtcdPsyFam:"Antécédents psychiatriques familiaux",
+    wAtcdSomIndiv:"Antécédents somatiques individuels", wAtcdSomFam:"Antécédents somatiques familiaux",
+    wLien:"Lien de parenté", wType:"Type",
+    wModeDebut:"Mode de début", wDeclencheurs:"Facteurs déclenchants", wEvolution:"Évolution / précisions",
+    wExamenMental:"Examen mental", wExamenPhysique:"Examen physique", wConstantes:"Constantes vitales",
+    wTechnique:"Inspection, palpation, percussion, auscultation selon le système",
+    wPrecisionsAnomalie:"Précisions si anomalie",
+    wTroubleHint:"Cochez les signes observés — l'app propose le diagnostic le plus probable, vous n'avez pas à le choisir en premier.",
+    wDetailRetenu:"Détail retenu", wRappels:"Rappels systématiques", wNotesComplementaires:"Notes complémentaires du médecin",
+    r1:"Sécuriser l'environnement du patient et du personnel", r2:"Éliminer une cause organique avant de conclure au psychiatrique",
+    r3:"Contacter le psychiatre de garde ou organiser le transfert si niveau rouge", r4:"Informer et associer l'entourage si possible",
+    riskBannerText:"Éléments à haut risque cochés — envisager une évaluation immédiate et la sécurisation des moyens létaux, conformément à votre protocole local.",
+    riskIdeationLabel:"Idéation suicidaire actuelle", risk_ideation_none:"Absente", risk_ideation_passive:"Passive", risk_ideation_active_noplan:"Active sans plan", risk_ideation_active_plan:"Active avec plan",
+    riskIntentionLabel:"Intention", risk_intention_none:"Aucune", risk_intention_ambivalent:"Ambivalente", risk_intention_present:"Présente",
+    riskMeansLabel:"Accès à des moyens létaux", risk_means_no:"Non", risk_means_possible:"Possible", risk_means_direct:"Direct",
+    riskHistoryLabel:"Antécédents de tentative", risk_history_none:"Aucun", risk_history_old:"Ancien (>1 an)", risk_history_recent:"Récent (<1 an)",
+    riskProtectiveLabel:"Facteurs protecteurs identifiés", risk_protective_entourage:"Entourage présent", risk_protective_enfants:"Enfants à charge", risk_protective_croyances:"Croyances religieuses", risk_protective_suivi:"Suivi psychiatrique en cours", risk_protective_projets:"Projets à court terme", risk_protective_aucun:"Aucun identifié",
+    riskNotesLabel:"Notes cliniques", detailsPlaceholder:"Détails", freeObservations:"Observations libres",
+    mseAppearanceLabel:"Présentation générale", mseAppearancePh:"Hygiène, contact visuel, comportement",
+    mseSpeechLabel:"Discours", mse_speech_normal:"Normal", mse_speech_slow:"Ralenti", mse_speech_fast:"Accéléré", mse_speech_poor:"Pauvre",
+    mseMoodLabel:"Humeur rapportée", mseMoodPh:"Dans les mots du patient",
+    mseAffectLabel:"Affect observé", mse_affect_congruent:"Congruent", mse_affect_incongruent:"Incongruent", mse_affect_blunted:"Émoussé", mse_affect_labile:"Labile",
+    mseThoughtLabel:"Cours de la pensée", mseThoughtPh:"Cohérent, tangentiel, coq-à-l'âne, fuite des idées…",
+    mseContentLabel:"Contenu de la pensée", mseContentPh:"Idées délirantes, obsessions, préoccupations",
+    msePerceptionLabel:"Perceptions", mse_perception_none:"Aucune anomalie", mse_perception_hallucinations:"Hallucinations rapportées",
+    mseCognitionLabel:"Cognition / orientation", mseCognitionPh:"Temps, espace, personne, attention, mémoire",
+    mseInsightLabel:"Insight et jugement",
+    spWarningLabel:"Signaux d'alerte personnels", sp_warning_isolement:"Isolement croissant", sp_warning_idees:"Verbalisation d'idées noires", sp_warning_dons:"Don d'objets personnels", sp_warning_substances:"Consommation accrue d'alcool/substances", sp_warning_sommeil:"Troubles du sommeil marqués", spWarningPh:"Pensées, situations ou émotions annonciatrices",
+    spCopingLabel:"Stratégies d'adaptation autonomes", sp_coping_respiration:"Respiration / relaxation", sp_coping_sport:"Activité physique", sp_coping_contact:"Contact avec un proche", sp_coping_ecriture:"Écriture / journal", sp_coping_activite:"Activité plaisante habituelle", spCopingPh:"Ce que le patient peut faire seul",
+    spDistractionLabel:"Personnes et lieux qui apaisent", sp_distraction_famille:"Famille", sp_distraction_amis:"Amis proches", sp_distraction_culte:"Lieu de culte", sp_distraction_nature:"Nature / extérieur", sp_distraction_creativite:"Activité créative",
+    spContactsLabel:"Personnes de confiance à contacter", spContactsPh:"Nom + lien (à compléter avec les numéros locaux)",
+    spEmergencyLabel:"Contact professionnel / urgence", spEmergencyHint:"Renseignez ici les numéros d'urgence réels de votre pays d'exercice — aucun numéro n'est pré-rempli par défaut.", spEmergencyPh:"Ligne d'urgence, service, numéro",
+    spMeansLabel:"Sécurisation de l'environnement", spMeansPh:"Retrait ou limitation d'accès aux moyens létaux",
+    somaHint:"Cochez ce qui est présent. Le verdict se met à jour automatiquement.",
+    soma_colon:"Côlon irritable", soma_palpitations:"Palpitations", soma_dermato:"Dermatose", soma_anxiete:"Anxiété générale", soma_cephalees:"Céphalées de tension", soma_vertiges:"Vertiges psychogènes", soma_fatigue:"Fatigue chronique",
+    somaRedFlagTitle:"Drapeaux rouges — orientent vers l'organique", somaRedFlagTitleDermato:"Éléments imposant l'avis dermatologique d'abord"
+  },
+  en: {
+    appName:"Psychiatry Toolkit", newRecord:"new record",
+    sessionIdTitle:"Session identifier (non-nominative recommended)",
+    refLabel:"Record reference", refHint:"Use a code, not the patient's full name.",
+    emergenciesTitle:"Psychiatric emergencies", emergenciesCardTitle:"🔴 Psychiatric emergencies",
+    emergenciesCardDesc:"Direct access — postpartum psychosis, food refusal, withdrawal, etc.",
+    modulesTitle:"Modules",
+    riskCardTitle:"Suicide risk assessment", riskCardDesc:"Ideation, intent, plan, means, factors",
+    mseCardTitle:"Mental state examination (MSE)", mseCardTitleFull:"Mental state examination", mseCardDesc:"Appearance, speech, thought, cognition",
+    safetyCardTitle:"Safety plan", safetyCardDesc:"Warning signs, strategies, contacts",
+    somaCardTitle:"Somatic manifestations of anxiety", somaCardDesc:"Irritable bowel, palpitations, dermatosis, headaches, vertigo, fatigue, general anxiety",
+    summaryCardTitle:"Summary & export", summaryCardDesc:"Compile modules into a clinical note",
+    summaryScreenTitle:"Session summary",
+    home:"Home", tabRisk:"Risk", tabMse:"MSE", tabSafety:"Safety", tabSummary:"Summary",
+    saveReturn:"Save and return",
+    summaryHint:"This summary compiles the completed modules. Review it before adding it to the patient's official record — this tool does not replace the medical record.",
+    resumeBtn:"◀ Return to edit the Emergency pathway",
+    printBtn:"Print / save as PDF", exportBtn:"Export data (.json)", importLabel:"Import a saved session",
+    wPrev:"Back", wNext:"Next", wNextLast:"View summary",
+    wStep1:"Identification & reason", wStep2:"History & background", wStep3:"Clinical examination", wStep4:"Suspected condition specifics", wStep5:"Synthesis & plan",
+    wAge:"Age", wProfession:"Occupation", wSexe:"Sex", wSituation:"Family situation",
+    wMotif:"Reason for consultation", wPrecisions:"Details",
+    wAtcdPsyIndiv:"Personal psychiatric history", wAtcdPsyFam:"Family psychiatric history",
+    wAtcdSomIndiv:"Personal medical history", wAtcdSomFam:"Family medical history",
+    wLien:"Relationship", wType:"Type",
+    wModeDebut:"Onset", wDeclencheurs:"Triggering factors", wEvolution:"Course / details",
+    wExamenMental:"Mental state exam", wExamenPhysique:"Physical exam", wConstantes:"Vital signs",
+    wTechnique:"Inspection, palpation, percussion, auscultation as relevant",
+    wPrecisionsAnomalie:"Details if abnormal",
+    wTroubleHint:"Check the signs observed — the app suggests the most likely diagnosis, you don't need to pick it first.",
+    wDetailRetenu:"Retained detail", wRappels:"Systematic reminders", wNotesComplementaires:"Additional physician notes",
+    r1:"Secure the environment for the patient and staff", r2:"Rule out an organic cause before concluding it is psychiatric",
+    r3:"Contact the on-call psychiatrist or arrange transfer if red level", r4:"Inform and involve family if possible",
+    riskBannerText:"High-risk elements checked — consider immediate evaluation and securing lethal means, per your local protocol.",
+    riskIdeationLabel:"Current suicidal ideation", risk_ideation_none:"None", risk_ideation_passive:"Passive", risk_ideation_active_noplan:"Active without plan", risk_ideation_active_plan:"Active with plan",
+    riskIntentionLabel:"Intent", risk_intention_none:"None", risk_intention_ambivalent:"Ambivalent", risk_intention_present:"Present",
+    riskMeansLabel:"Access to lethal means", risk_means_no:"No", risk_means_possible:"Possible", risk_means_direct:"Direct",
+    riskHistoryLabel:"History of attempts", risk_history_none:"None", risk_history_old:"Old (>1 year)", risk_history_recent:"Recent (<1 year)",
+    riskProtectiveLabel:"Identified protective factors", risk_protective_entourage:"Supportive family/friends present", risk_protective_enfants:"Dependent children", risk_protective_croyances:"Religious beliefs", risk_protective_suivi:"Ongoing psychiatric follow-up", risk_protective_projets:"Short-term plans", risk_protective_aucun:"None identified",
+    riskNotesLabel:"Clinical notes", detailsPlaceholder:"Details", freeObservations:"Free-text observations",
+    mseAppearanceLabel:"General appearance", mseAppearancePh:"Hygiene, eye contact, behavior",
+    mseSpeechLabel:"Speech", mse_speech_normal:"Normal", mse_speech_slow:"Slow", mse_speech_fast:"Rapid", mse_speech_poor:"Poor",
+    mseMoodLabel:"Reported mood", mseMoodPh:"In the patient's own words",
+    mseAffectLabel:"Observed affect", mse_affect_congruent:"Congruent", mse_affect_incongruent:"Incongruent", mse_affect_blunted:"Blunted", mse_affect_labile:"Labile",
+    mseThoughtLabel:"Thought process", mseThoughtPh:"Coherent, tangential, derailment, flight of ideas…",
+    mseContentLabel:"Thought content", mseContentPh:"Delusions, obsessions, preoccupations",
+    msePerceptionLabel:"Perceptions", mse_perception_none:"No abnormality", mse_perception_hallucinations:"Hallucinations reported",
+    mseCognitionLabel:"Cognition / orientation", mseCognitionPh:"Time, place, person, attention, memory",
+    mseInsightLabel:"Insight and judgment",
+    spWarningLabel:"Personal warning signs", sp_warning_isolement:"Increasing isolation", sp_warning_idees:"Verbalizing dark thoughts", sp_warning_dons:"Giving away personal belongings", sp_warning_substances:"Increased alcohol/substance use", sp_warning_sommeil:"Marked sleep disturbance", spWarningPh:"Thoughts, situations, or emotions that act as warning signs",
+    spCopingLabel:"Independent coping strategies", sp_coping_respiration:"Breathing / relaxation", sp_coping_sport:"Physical activity", sp_coping_contact:"Contacting a loved one", sp_coping_ecriture:"Writing / journaling", sp_coping_activite:"Usual enjoyable activity", spCopingPh:"What the patient can do alone",
+    spDistractionLabel:"People and places that provide comfort", sp_distraction_famille:"Family", sp_distraction_amis:"Close friends", sp_distraction_culte:"Place of worship", sp_distraction_nature:"Nature / outdoors", sp_distraction_creativite:"Creative activity",
+    spContactsLabel:"Trusted contacts to reach out to", spContactsPh:"Name + relationship (fill in with local numbers)",
+    spEmergencyLabel:"Professional / emergency contact", spEmergencyHint:"Enter the actual emergency numbers for your country of practice here — no number is pre-filled by default.", spEmergencyPh:"Emergency line, service, number",
+    spMeansLabel:"Securing the environment", spMeansPh:"Removing or limiting access to lethal means",
+    somaHint:"Check what is present. The verdict updates automatically.",
+    soma_colon:"Irritable bowel", soma_palpitations:"Palpitations", soma_dermato:"Skin condition", soma_anxiete:"Generalized anxiety", soma_cephalees:"Tension headache", soma_vertiges:"Psychogenic vertigo", soma_fatigue:"Chronic fatigue",
+    somaRedFlagTitle:"Red flags — point toward an organic cause", somaRedFlagTitleDermato:"Elements requiring a dermatology opinion first"
+  },
+  ar: {
+    appName:"مجموعة أدوات الطب النفسي", newRecord:"ملف جديد",
+    sessionIdTitle:"معرّف الجلسة (يُفضّل غير اسمي)",
+    refLabel:"مرجع الملف", refHint:"استخدم رمزاً، وليس الاسم الكامل للمريض.",
+    emergenciesTitle:"الطوارئ النفسية", emergenciesCardTitle:"🔴 الطوارئ النفسية",
+    emergenciesCardDesc:"وصول مباشر — ذهان النفاس، رفض الطعام، الانسحاب، إلخ.",
+    modulesTitle:"الوحدات",
+    riskCardTitle:"تقييم خطر الانتحار", riskCardDesc:"الأفكار، النية، الخطة، الوسائل، العوامل",
+    mseCardTitle:"فحص الحالة العقلية", mseCardTitleFull:"فحص الحالة العقلية", mseCardDesc:"المظهر، الكلام، الفكر، الإدراك",
+    safetyCardTitle:"خطة السلامة", safetyCardDesc:"علامات الإنذار، الاستراتيجيات، جهات الاتصال",
+    somaCardTitle:"المظاهر الجسدية للقلق", somaCardDesc:"القولون العصبي، الخفقان، الجلد، الصداع، الدوار، التعب، القلق العام",
+    summaryCardTitle:"الملخص والتصدير", summaryCardDesc:"تجميع الوحدات في ملاحظة سريرية",
+    summaryScreenTitle:"ملخص الجلسة",
+    home:"الرئيسية", tabRisk:"الخطر", tabMse:"الفحص العقلي", tabSafety:"السلامة", tabSummary:"الملخص",
+    saveReturn:"حفظ والعودة",
+    summaryHint:"يجمع هذا الملخص الوحدات المكتملة. راجعه قبل إضافته إلى الملف الطبي الرسمي — هذه الأداة لا تحل محل الملف الطبي.",
+    resumeBtn:"◀ العودة لتعديل مسار الطوارئ",
+    printBtn:"طباعة / حفظ كـ PDF", exportBtn:"تصدير البيانات (.json)", importLabel:"استيراد جلسة محفوظة",
+    wPrev:"السابق", wNext:"التالي", wNextLast:"عرض الملخص",
+    wStep1:"الهوية وسبب الاستشارة", wStep2:"السوابق والتاريخ المرضي", wStep3:"الفحص السريري", wStep4:"خصائص الاضطراب المشتبه به", wStep5:"الخلاصة والتوجيه",
+    wAge:"العمر", wProfession:"المهنة", wSexe:"الجنس", wSituation:"الحالة العائلية",
+    wMotif:"سبب الاستشارة", wPrecisions:"تفاصيل",
+    wAtcdPsyIndiv:"السوابق النفسية الشخصية", wAtcdPsyFam:"السوابق النفسية العائلية",
+    wAtcdSomIndiv:"السوابق الجسدية الشخصية", wAtcdSomFam:"السوابق الجسدية العائلية",
+    wLien:"صلة القرابة", wType:"النوع",
+    wModeDebut:"طريقة البداية", wDeclencheurs:"العوامل المحفزة", wEvolution:"التطور / تفاصيل",
+    wExamenMental:"الفحص العقلي", wExamenPhysique:"الفحص الجسدي", wConstantes:"العلامات الحيوية",
+    wTechnique:"الفحص، الجس، القرع، التسمع حسب الجهاز",
+    wPrecisionsAnomalie:"تفاصيل في حال وجود خلل",
+    wTroubleHint:"ضع علامة على العلامات الملاحظة — يقترح التطبيق التشخيص الأرجح، لست بحاجة لاختياره أولاً.",
+    wDetailRetenu:"التفصيل المعتمد", wRappels:"تذكيرات أساسية", wNotesComplementaires:"ملاحظات إضافية من الطبيب",
+    r1:"تأمين محيط المريض والطاقم", r2:"استبعاد سبب عضوي قبل الاستنتاج بأنه نفسي",
+    r3:"الاتصال بطبيب نفسي مناوب أو تنظيم النقل في حال المستوى الأحمر", r4:"إبلاغ وإشراك المحيط إن أمكن",
+    riskBannerText:"تم تحديد عناصر عالية الخطورة — يُنصح بإجراء تقييم فوري وتأمين الوسائل القاتلة وفق البروتوكول المحلي لديك.",
+    riskIdeationLabel:"الأفكار الانتحارية الحالية", risk_ideation_none:"غائبة", risk_ideation_passive:"سلبية", risk_ideation_active_noplan:"فعّالة دون خطة", risk_ideation_active_plan:"فعّالة مع خطة",
+    riskIntentionLabel:"النية", risk_intention_none:"غائبة", risk_intention_ambivalent:"متناقضة", risk_intention_present:"حاضرة",
+    riskMeansLabel:"إمكانية الوصول لوسائل قاتلة", risk_means_no:"لا", risk_means_possible:"ممكن", risk_means_direct:"مباشر",
+    riskHistoryLabel:"سوابق محاولات", risk_history_none:"لا يوجد", risk_history_old:"قديمة (أكثر من سنة)", risk_history_recent:"حديثة (أقل من سنة)",
+    riskProtectiveLabel:"عوامل الحماية المحددة", risk_protective_entourage:"وجود محيط داعم", risk_protective_enfants:"أطفال تحت الكفالة", risk_protective_croyances:"معتقدات دينية", risk_protective_suivi:"متابعة نفسية جارية", risk_protective_projets:"مشاريع قصيرة المدى", risk_protective_aucun:"لا يوجد محدد",
+    riskNotesLabel:"ملاحظات سريرية", detailsPlaceholder:"تفاصيل", freeObservations:"ملاحظات حرة",
+    mseAppearanceLabel:"المظهر العام", mseAppearancePh:"النظافة، التواصل البصري، السلوك",
+    mseSpeechLabel:"الكلام", mse_speech_normal:"طبيعي", mse_speech_slow:"بطيء", mse_speech_fast:"سريع", mse_speech_poor:"فقير",
+    mseMoodLabel:"المزاج المُصرَّح به", mseMoodPh:"بكلمات المريض",
+    mseAffectLabel:"الوجدان الملاحَظ", mse_affect_congruent:"متوافق", mse_affect_incongruent:"غير متوافق", mse_affect_blunted:"مسطح", mse_affect_labile:"متقلب",
+    mseThoughtLabel:"سير الفكر", mseThoughtPh:"مترابط، مماطل، تفكك، تسارع الأفكار…",
+    mseContentLabel:"محتوى الفكر", mseContentPh:"أفكار وهامية، وسواس، هواجس",
+    msePerceptionLabel:"الإدراكات الحسية", mse_perception_none:"لا يوجد خلل", mse_perception_hallucinations:"هلاوس مُبلَّغ عنها",
+    mseCognitionLabel:"الإدراك المعرفي / التوجه", mseCognitionPh:"الزمان، المكان، الشخص، الانتباه، الذاكرة",
+    mseInsightLabel:"الوعي بالمرض والحكم على الأمور",
+    spWarningLabel:"علامات الإنذار الشخصية", sp_warning_isolement:"عزلة متزايدة", sp_warning_idees:"التعبير عن أفكار سوداوية", sp_warning_dons:"إهداء ممتلكات شخصية", sp_warning_substances:"زيادة تعاطي الكحول/المواد", sp_warning_sommeil:"اضطراب نوم ملحوظ", spWarningPh:"أفكار أو مواقف أو مشاعر تُنذر بالخطر",
+    spCopingLabel:"استراتيجيات التأقلم الذاتية", sp_coping_respiration:"التنفس / الاسترخاء", sp_coping_sport:"نشاط بدني", sp_coping_contact:"التواصل مع شخص مقرب", sp_coping_ecriture:"الكتابة / تدوين اليوميات", sp_coping_activite:"نشاط ممتع معتاد", spCopingPh:"ما يمكن للمريض فعله بمفرده",
+    spDistractionLabel:"أشخاص وأماكن تبعث على الطمأنينة", sp_distraction_famille:"العائلة", sp_distraction_amis:"أصدقاء مقربون", sp_distraction_culte:"مكان العبادة", sp_distraction_nature:"الطبيعة / الخارج", sp_distraction_creativite:"نشاط إبداعي",
+    spContactsLabel:"أشخاص موثوقون للتواصل معهم", spContactsPh:"الاسم + صلة القرابة (يُستكمل بالأرقام المحلية)",
+    spEmergencyLabel:"جهة اتصال مهنية / طارئة", spEmergencyHint:"أدخل هنا أرقام الطوارئ الفعلية لبلد ممارستك — لا يوجد رقم مُدرج مسبقاً بشكل افتراضي.", spEmergencyPh:"خط الطوارئ، المصلحة، الرقم",
+    spMeansLabel:"تأمين المحيط", spMeansPh:"إزالة أو الحد من الوصول إلى الوسائل القاتلة",
+    somaHint:"ضع علامة على ما هو موجود. يتم تحديث الخلاصة تلقائياً.",
+    soma_colon:"القولون العصبي", soma_palpitations:"الخفقان", soma_dermato:"حالة جلدية", soma_anxiete:"القلق العام", soma_cephalees:"الصداع التوتري", soma_vertiges:"الدوار النفسي", soma_fatigue:"التعب المزمن",
+    somaRedFlagTitle:"علامات تحذيرية — توحي بسبب عضوي", somaRedFlagTitleDermato:"عناصر تستوجب استشارة الجلدية أولاً"
+  }
+};
+function t(key){ return (UI_STRINGS[currentLang] && UI_STRINGS[currentLang][key]) || UI_STRINGS.fr[key] || key; }
+
+function applyStaticTranslations(){
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key = el.getAttribute('data-i18n');
+    if(UI_STRINGS[currentLang] && UI_STRINGS[currentLang][key]!==undefined) el.textContent = UI_STRINGS[currentLang][key];
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
+    const key = el.getAttribute('data-i18n-placeholder');
+    if(UI_STRINGS[currentLang] && UI_STRINGS[currentLang][key]!==undefined) el.setAttribute('placeholder', UI_STRINGS[currentLang][key]);
+  });
+  document.querySelectorAll('#langSwitch button').forEach(b=>{
+    b.style.background = b.dataset.lang===currentLang ? 'var(--accent)' : 'transparent';
+    b.style.color = b.dataset.lang===currentLang ? '#fff' : 'var(--ink)';
+  });
+}
+
+function setLang(lang){
+  currentLang = lang;
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang==='ar' ? 'rtl' : 'ltr';
+  applyStaticTranslations();
+  // re-render whichever dynamic screen is currently active so wizard/summary text updates too
+  const activeScreen = document.querySelector('.screen.active');
+  if(activeScreen && activeScreen.id==='screen-urgence' && typeof renderWizardStep==='function') renderWizardStep();
+  if(activeScreen && activeScreen.id==='screen-summary' && typeof renderSummary==='function') renderSummary();
+  if(activeScreen && activeScreen.id==='screen-soma' && typeof renderSoma==='function'){
+    document.getElementById('somaRedFlagTitle').textContent = currentSoma==='dermato' ? t('somaRedFlagTitleDermato') : t('somaRedFlagTitle');
+    renderSoma();
+  }
+  if(activeScreen && activeScreen.id==='screen-risk') updateRiskBanner();
+}
+
+// ---- navigation ----
+function goTo(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  document.querySelectorAll('nav .tab').forEach(t=>t.classList.toggle('active', t.dataset.screen===name));
+  if(name==='summary') renderSummary();
+  if(name==='urgence'){ wizardStepNum = 1; renderWizardStep(); }
+  window.scrollTo(0,0);
+}
+
+// Reopen the Urgence wizard at whichever step it was left on (no data loss),
+// used by the "revenir corriger" button on the Résumé screen.
+function resumeUrgence(){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-urgence').classList.add('active');
+  document.querySelectorAll('nav .tab').forEach(t=>t.classList.toggle('active', t.dataset.screen==='urgence'));
+  renderWizardStep();
+  window.scrollTo(0,0);
+}
+
+// ---- choice chips (single-select rows only, identified by data-group) ----
+document.querySelectorAll('.choice-row[data-group]').forEach(row=>{
+  row.querySelectorAll('.choice').forEach(ch=>{
+    ch.addEventListener('click', ()=>{
+      row.querySelectorAll('.choice').forEach(c=>c.classList.remove('selected','risk-selected'));
+      if(ch.dataset.risk==='true'){ ch.classList.add('risk-selected'); } else { ch.classList.add('selected'); }
+      ch.dataset.active = "true";
+      row.querySelectorAll('.choice').forEach(c=>{ if(c!==ch) c.dataset.active="false"; });
+      updateRiskBanner();
+    });
+  });
+});
+
+// ---- static multi-select chip rows (risk protective factors, safety plan) ----
+['riskProtectiveChips','spWarningChips','spCopingChips','spDistractionChips'].forEach(id=>{
+  const row = document.getElementById(id);
+  if(row){ row.querySelectorAll('.choice').forEach(ch=>{ ch.addEventListener('click', ()=>ch.classList.toggle('selected')); }); }
+});
+
+function updateRiskBanner(){
+  const anyRisk = [...document.querySelectorAll('#screen-risk .choice')]
+    .some(c => c.dataset.active==='true' && c.dataset.risk==='true');
+  document.getElementById('riskBanner').classList.toggle('show', anyRisk);
+}
+
+function getChoice(group){
+  const el = document.querySelector(`.choice-row[data-group="${group}"] .choice[data-active="true"]`);
+  return el ? t('risk_'+group+'_'+el.dataset.value) : '—';
+}
+
+function val(id){ const el=document.getElementById(id); return el && el.value.trim() ? el.value.trim() : '—'; }
+
+function renderSummary(){
+  const ref = val('patientRef');
+  document.getElementById('patientTag').textContent = ref==='—' ? 'nouveau dossier' : ref;
+  const date = new Date().toLocaleDateString('fr-FR');
+
+  const motifColor = window.lastMotifColor;
+  const troubleColor = window.lastUrgenceColor;
+  let niveauLine = '—';
+  if(motifColor && troubleColor){
+    const finalColor = worstColor([motifColor, troubleColor]);
+    const sources = [];
+    if(motifColor===finalColor) sources.push('motif de consultation');
+    if(troubleColor===finalColor) sources.push('signes cliniques cochés');
+    niveauLine = `${COLOR_LABEL[finalColor]} (déterminé par : ${sources.join(' et ')})`;
+  }
+
+  const text =
+`RÉSUMÉ DE SÉANCE — ${date}
+Référence dossier : ${ref}
+
+── PARCOURS URGENCE PSYCHIATRIQUE ──
+État civil : ${urg.civil.age||'—'}, ${urg.civil.sexe?Lmisc('sexe',urg.civil.sexe):'—'}, ${urg.civil.profession||'—'}, ${urg.civil.situation?Lmisc('situation',urg.civil.situation):'—'}
+Motif de consultation : ${urg.motifChips.map(k=>L('motifs',k,'label')).join(', ')||'—'}${urg.motif ? ' — '+urg.motif : ''}
+Antécédents psy individuels : ${urg.atcd.psyIndivPresence?Lmisc('ouiNon',urg.atcd.psyIndivPresence):'—'}${urg.atcd.psyIndivChips.length ? ' ('+urg.atcd.psyIndivChips.map(k=>Lmisc('atcdPsyIndiv',k)).join(', ')+')' : ''}${urg.atcd.psyIndiv ? ' — '+urg.atcd.psyIndiv : ''}
+Antécédents psy familiaux : ${urg.atcd.psyFamPresence?Lmisc('ouiNon',urg.atcd.psyFamPresence):'—'}${urg.atcd.psyFamLien.length ? ' — lien : '+urg.atcd.psyFamLien.map(k=>Lmisc('lienParente',k)).join(', ') : ''}${urg.atcd.psyFamChips.length ? ' ('+urg.atcd.psyFamChips.map(k=>Lmisc('atcdPsyFam',k)).join(', ')+')' : ''}${urg.atcd.psyFam ? ' — '+urg.atcd.psyFam : ''}
+Antécédents somatiques individuels : ${urg.atcd.somIndivPresence?Lmisc('ouiNon',urg.atcd.somIndivPresence):'—'}${urg.atcd.somIndivChips.length ? ' ('+urg.atcd.somIndivChips.map(k=>Lmisc('atcdSom',k)).join(', ')+')' : ''}${urg.atcd.somIndiv ? ' — '+urg.atcd.somIndiv : ''}
+Antécédents somatiques familiaux : ${urg.atcd.somFamPresence?Lmisc('ouiNon',urg.atcd.somFamPresence):'—'}${urg.atcd.somFamLien.length ? ' — lien : '+urg.atcd.somFamLien.map(k=>Lmisc('lienParente',k)).join(', ') : ''}${urg.atcd.somFamChips.length ? ' ('+urg.atcd.somFamChips.map(k=>Lmisc('atcdSom',k)).join(', ')+')' : ''}${urg.atcd.somFam ? ' — '+urg.atcd.somFam : ''}
+Mode de début : ${urg.histoireDebut?Lmisc('modeDebut',urg.histoireDebut):'—'}
+Facteurs déclenchants : ${urg.histoireDeclencheurs.map(k=>Lmisc('declencheurs',k)).join(', ')||'—'}
+Évolution : ${urg.histoire||'—'}
+
+Examen mental :
+${MSE_DOMAINS.map(dm=>`  - ${L('mse',dm.key,'label')} : ${urg.mse[dm.key] ? L('mse',dm.key).options[urg.mse[dm.key]] : '—'}`).join('\n')}
+
+Constantes : TA ${urg.vitals.ta||'—'} | FC ${urg.vitals.fc||'—'} | FR ${urg.vitals.fr||'—'} | T° ${urg.vitals.temp||'—'} | SpO2 ${urg.vitals.spo2||'—'} | Glycémie ${urg.vitals.glyc||'—'}
+Examen physique :
+${PHYSIO_SYSTEMS.map(s=>`  - ${L('physio',s.key)} : ${urg.physio[s.key]?.status ? (urg.physio[s.key].status==='Normal'?L('physio','normal'):L('physio','anomalie')) : '—'}${urg.physio[s.key]?.notes ? ' ('+urg.physio[s.key].notes+')' : ''}`).join('\n')}
+
+Signes cochés : ${[...urgenceSigns].map(k=>L('signs',k)).join(', ')||'—'}
+Situation évaluée (la plus probable) : ${urgenceSigns.size ? L('urgence',currentUrgence,'label') : '—'}
+Niveau final : ${niveauLine}
+Notes complémentaires : ${urg.conduite||'—'}
+
+── ÉVALUATION DU RISQUE SUICIDAIRE ──
+Idéation : ${getChoice('ideation')}
+Intention : ${getChoice('intention')}
+Accès aux moyens : ${getChoice('means')}
+Antécédents : ${getChoice('history')}
+Facteurs protecteurs : ${val('riskProtective')}
+Notes : ${val('riskNotes')}
+
+── MANIFESTATIONS SOMATIQUES DE L'ANXIÉTÉ ──
+Motif évalué : ${SOMA_DATA[currentSoma].label}
+Conclusion : ${document.getElementById('somaVerdict').textContent}
+
+── PLAN DE SÉCURITÉ ──
+Signaux d'alerte : ${val('spWarning')}
+Stratégies autonomes : ${val('spCoping')}
+Sources d'apaisement : ${val('spDistraction')}
+Contacts de confiance : ${val('spContacts')}
+Contact d'urgence : ${val('spEmergency')}
+Sécurisation environnement : ${val('spMeans')}
+
+— Document généré à des fins d'organisation clinique. Ne remplace pas le jugement professionnel ni le dossier médical officiel. —`;
+
+  document.getElementById('summaryText').textContent = text;
+}
+
+// ---- psychiatric emergencies module ----
+// ==================================================================
+// CLINICAL CONTENT — key-based, trilingual (fr/en/ar)
+// Stable keys drive all logic (matching engine, storage); labels are
+// looked up per current language at render time via L('dict', key).
+// ==================================================================
+
+// ---- psychiatric emergencies wizard state ----
+const urg = {
+  civil: {age:'', sexe:'', profession:'', situation:''},
+  motifChips: [], motif: '',
+  atcd: {
+    psyIndivPresence:'', psyIndivChips:[], psyIndiv:'',
+    psyFamPresence:'', psyFamLien:[], psyFamChips:[], psyFam:'',
+    somIndivPresence:'', somIndivChips:[], somIndiv:'',
+    somFamPresence:'', somFamLien:[], somFamChips:[], somFam:''
+  },
+  histoireDebut:'', histoireDeclencheurs:[], histoire: '',
+  vitals: {ta:'', fc:'', fr:'', temp:'', spo2:'', glyc:''},
+  mse: {},
+  physio: {},
+  conduite: ''
+};
+let urgenceSigns = new Set();
+let currentUrgence = 'puerperale';
+
+const URGENCE_KEYS = ["suicide","agitation","puerperale","maniaque","catatonie","psychoseaigue","panique","stressaigu","alimentaire","syndromemalin","serotoninergique","sevrage","intoxication","heteroagressivite","depression"];
+
+const CLINICAL_I18N = {
+  urgence: {
+    fr: {
+      suicide:{label:"Crise suicidaire", actionRed:"Évaluer le risque de récidive. Éloigner le sujet des moyens dangereux. Vérifier les moyens de protection disponibles ; si impossibles à mettre en place, adresser en urgence psychiatrique.", actionOrange:"Renforcer la surveillance et les moyens de protection. Réévaluer à court terme ; adresser en psychiatrie en cas d'aggravation."},
+      agitation:{label:"Agitation psychomotrice", actionRed:"Assurer la sécurité du patient et de l'entourage. Éviter toute escalade. Contention physique si nécessaire. Sédation par voie injectable. Adresser en urgence psychiatrique.", actionOrange:""},
+      puerperale:{label:"Psychose puerpérale", actionRed:"Séparer la mère de l'enfant en raison du risque d'infanticide. Bilan inflammatoire complet. Vérifier les antécédents. Sédation de la patiente. Adresser en consultation de psychiatrie le plus tôt possible.", actionOrange:"Avis psychiatrique rapide (moins de 48h)."},
+      psychoseaigue:{label:"Psychose aiguë / bouffée délirante", actionRed:"Sécuriser le patient — risque de raptus suicidaire. Adresser pour hospitalisation en psychiatrie.", actionOrange:"Avis psychiatrique rapide."},
+      maniaque:{label:"Accès maniaque", actionRed:"Sédation par voie injectable si motricité extrême ou refus de la voie orale. Hospitalisation en psychiatrie.", actionOrange:"Vérifier l'observance médicamenteuse. Si la voie orale est acceptée, adresser en consultation de psychiatrie."},
+      catatonie:{label:"Catatonie", actionRed:"Arrêter tout traitement neuroleptique. Vérifier l'état nutritionnel et d'hydratation. Doser les CPK. Adresser en urgence psychiatrique.", actionOrange:""},
+      panique:{label:"Attaque de panique", actionRed:"Ne pas conclure à une origine anxieuse avant un bilan cardiaque (ECG, troponine si doute).", actionOrange:"Écoute attentive. Technique de respiration ralentie (dans une paille). Adresser en consultation ambulatoire dès que la crise est passée."},
+      stressaigu:{label:"État de stress aigu", actionRed:"Évaluation psychiatrique urgente.", actionOrange:"Rassurer sans hausser la voix. Éloigner la source de stress. Ne pas administrer de benzodiazépines à ce stade. Adresser en consultation ambulatoire."},
+      alimentaire:{label:"Refus alimentaire aigu", actionRed:"Évaluer la durée d'évolution et les perturbations biologiques. Supplémenter si nécessaire. Si persistance malgré amélioration du bilan, orienter en urgence.", actionOrange:"Si le bilan s'améliore et les troubles s'atténuent, une consultation en ambulatoire suffit."},
+      syndromemalin:{label:"Syndrome malin des neuroleptiques", actionRed:"Arrêt immédiat de tout traitement neuroleptique. Bilan complet incluant fonction rénale et CPK. Adresser en réanimation.", actionOrange:""},
+      serotoninergique:{label:"Syndrome sérotoninergique", actionRed:"Arrêt immédiat de l'agent sérotoninergique en cause — ne jamais le réinstaurer. Réhydratation, refroidissement si hyperthermie, benzodiazépines si agitation. Adresser en réanimation si signes de gravité.", actionOrange:""},
+      sevrage:{label:"Sevrage (alcool / benzodiazépines)", actionRed:"Réhydratation massive. Vitaminothérapie B1-B6-B12 (prévention du syndrome de Gayet-Wernicke). Instaurer une benzodiazépine. Adresser en centre d'addictologie après stabilisation.", actionOrange:"Surveillance rapprochée, prise en charge encadrée (benzodiazépines selon protocole)."},
+      intoxication:{label:"Intoxication aiguë (alcool / stupéfiants)", actionRed:"Réhydratation, ECG systématique. Appeler le centre antipoison/toxicologie. Hospitalisation en réanimation si signes de gravité.", actionOrange:""},
+      heteroagressivite:{label:"Hétéroagressivité / violence", actionRed:"Assurer la sécurité de l'entourage. Sédation. Adresser en urgence psychiatrique. Envisager un certificat de dangerosité pour une hospitalisation d'office si nécessaire.", actionOrange:""},
+      depression:{label:"Dépression sévère à risque suicidaire", actionRed:"Même prise en charge que la crise suicidaire : éloigner des moyens dangereux, sécuriser, adresser en urgence psychiatrique.", actionOrange:"Sédation si besoin. Adresser en consultation de psychiatrie."}
+    },
+    en: {
+      suicide:{label:"Suicidal crisis", actionRed:"Assess the risk of recurrence. Remove the person from dangerous means. Check available protective measures; if these cannot be put in place, refer to psychiatric emergency care.", actionOrange:"Increase monitoring and protective measures. Reassess in the short term; refer to psychiatry if worsening."},
+      agitation:{label:"Psychomotor agitation", actionRed:"Ensure the safety of the patient and those around them. Avoid any escalation. Physical restraint if necessary. Injectable sedation. Refer to psychiatric emergency care.", actionOrange:""},
+      puerperale:{label:"Postpartum psychosis", actionRed:"Separate the mother from the infant due to the risk of infanticide. Full inflammatory work-up. Check history. Sedate the patient. Refer for psychiatric consultation as soon as possible.", actionOrange:"Prompt psychiatric opinion (within 48 hours)."},
+      psychoseaigue:{label:"Acute psychosis / brief psychotic episode", actionRed:"Secure the patient — risk of impulsive suicidal acting-out. Refer for psychiatric hospitalization.", actionOrange:"Prompt psychiatric opinion."},
+      maniaque:{label:"Manic episode", actionRed:"Injectable sedation if extreme motor activity or refusal of oral route. Psychiatric hospitalization.", actionOrange:"Check medication adherence. If the oral route is accepted, refer for psychiatric consultation."},
+      catatonie:{label:"Catatonia", actionRed:"Stop all antipsychotic treatment. Check nutritional and hydration status. Measure CPK. Refer to psychiatric emergency care.", actionOrange:""},
+      panique:{label:"Panic attack", actionRed:"Do not conclude an anxiety origin before a cardiac work-up (ECG, troponin if in doubt).", actionOrange:"Attentive listening. Slow-breathing technique (through a straw). Refer for outpatient consultation once the crisis has passed."},
+      stressaigu:{label:"Acute stress reaction", actionRed:"Urgent psychiatric evaluation.", actionOrange:"Reassure without raising your voice. Remove the source of stress. Do not give benzodiazepines at this stage. Refer for outpatient consultation."},
+      alimentaire:{label:"Acute food refusal", actionRed:"Assess duration and biological disturbances. Supplement if necessary. If it persists despite improved lab results, refer urgently.", actionOrange:"If lab results improve and symptoms ease, an outpatient consultation is sufficient."},
+      syndromemalin:{label:"Neuroleptic malignant syndrome", actionRed:"Immediately stop all antipsychotic treatment. Full work-up including renal function and CPK. Refer to intensive care.", actionOrange:""},
+      serotoninergique:{label:"Serotonin syndrome", actionRed:"Immediately stop the causative serotonergic agent — never restart it. Rehydration, cooling if hyperthermic, benzodiazepines if agitated. Refer to intensive care if severe.", actionOrange:""},
+      sevrage:{label:"Withdrawal (alcohol / benzodiazepines)", actionRed:"Massive rehydration. B1-B6-B12 vitamin therapy (Wernicke's syndrome prevention). Start a benzodiazepine. Refer to an addiction center after stabilization.", actionOrange:"Close monitoring, supervised management (benzodiazepines per protocol)."},
+      intoxication:{label:"Acute intoxication (alcohol / drugs)", actionRed:"Rehydration, systematic ECG. Call the poison control/toxicology center. Intensive care admission if severe.", actionOrange:""},
+      heteroagressivite:{label:"Hetero-aggression / violence", actionRed:"Ensure the safety of those around. Sedation. Refer to psychiatric emergency care. Consider a dangerousness certificate for involuntary hospitalization if necessary.", actionOrange:""},
+      depression:{label:"Severe depression with suicide risk", actionRed:"Same management as a suicidal crisis: remove dangerous means, secure, refer to psychiatric emergency care.", actionOrange:"Sedation if needed. Refer for psychiatric consultation."}
+    },
+    ar: {
+      suicide:{label:"أزمة انتحارية", actionRed:"تقييم خطر التكرار. إبعاد الشخص عن الوسائل الخطرة. التحقق من وسائل الحماية المتاحة؛ إذا تعذّر توفيرها، التوجيه إلى الطوارئ النفسية.", actionOrange:"تعزيز المراقبة ووسائل الحماية. إعادة التقييم على المدى القصير؛ التوجيه إلى الطب النفسي في حال التدهور."},
+      agitation:{label:"الهياج النفسي الحركي", actionRed:"تأمين سلامة المريض والمحيطين به. تجنب أي تصعيد. التقييد الجسدي عند الحاجة. تهدئة عن طريق الحقن. التوجيه إلى الطوارئ النفسية.", actionOrange:""},
+      puerperale:{label:"ذهان النفاس", actionRed:"فصل الأم عن الرضيع بسبب خطر إيذاء الطفل. تقييم التهابي كامل. التحقق من السوابق. تهدئة المريضة. التوجيه لاستشارة نفسية في أقرب وقت ممكن.", actionOrange:"استشارة نفسية سريعة (خلال 48 ساعة)."},
+      psychoseaigue:{label:"ذهان حاد / نوبة ذهانية وجيزة", actionRed:"تأمين المريض — خطر اندفاع انتحاري مفاجئ. التوجيه للاستشفاء النفسي.", actionOrange:"استشارة نفسية سريعة."},
+      maniaque:{label:"نوبة هوس", actionRed:"تهدئة عن طريق الحقن في حال النشاط الحركي المفرط أو رفض الطريق الفموي. الاستشفاء النفسي.", actionOrange:"التحقق من الالتزام الدوائي. إذا قُبل الطريق الفموي، التوجيه لاستشارة نفسية."},
+      catatonie:{label:"الذهول الجامودي (الكاتاتونيا)", actionRed:"إيقاف كل علاج مضاد ذهاني. التحقق من الحالة التغذوية والإماهة. قياس إنزيم CPK. التوجيه إلى الطوارئ النفسية.", actionOrange:""},
+      panique:{label:"نوبة هلع", actionRed:"لا تُستبعد الأسباب القلبية قبل إجراء تقييم قلبي (تخطيط القلب، تروبونين عند الشك).", actionOrange:"الإصغاء الجيد. تقنية التنفس البطيء (عبر ماصة). التوجيه لاستشارة خارجية بعد زوال النوبة."},
+      stressaigu:{label:"رد فعل الإجهاد الحاد", actionRed:"تقييم نفسي عاجل.", actionOrange:"الطمأنة دون رفع الصوت. إبعاد مصدر التوتر. عدم إعطاء البنزوديازيبينات في هذه المرحلة. التوجيه لاستشارة خارجية."},
+      alimentaire:{label:"رفض حاد للتغذية", actionRed:"تقييم مدة التطور والاضطرابات البيولوجية. التعويض الغذائي عند الحاجة. في حال الاستمرار رغم تحسن الفحوصات، التوجيه العاجل.", actionOrange:"إذا تحسنت الفحوصات وخفّت الأعراض، تكفي استشارة خارجية."},
+      syndromemalin:{label:"المتلازمة الخبيثة للمضادات الذهانية", actionRed:"الإيقاف الفوري لكل علاج مضاد ذهاني. تقييم كامل يشمل وظائف الكلى وإنزيم CPK. التوجيه إلى الإنعاش.", actionOrange:""},
+      serotoninergique:{label:"متلازمة السيروتونين", actionRed:"الإيقاف الفوري للعامل السيروتونيني المسبب — عدم إعادة إعطائه إطلاقاً. الإماهة، التبريد عند فرط الحرارة، البنزوديازيبينات عند الهياج. التوجيه إلى الإنعاش عند وجود علامات خطورة.", actionOrange:""},
+      sevrage:{label:"متلازمة الانسحاب (كحول / بنزوديازيبينات)", actionRed:"إماهة مكثفة. علاج بالفيتامينات B1-B6-B12 (للوقاية من متلازمة غايي-فيرنيكه). البدء ببنزوديازيبين. التوجيه إلى مركز إدمان بعد الاستقرار.", actionOrange:"مراقبة لصيقة، تكفل مؤطر (بنزوديازيبينات وفق البروتوكول)."},
+      intoxication:{label:"تسمم حاد (كحول / مخدرات)", actionRed:"الإماهة، تخطيط قلب منهجي. الاتصال بمركز مكافحة السموم. الاستشفاء في الإنعاش عند وجود علامات خطورة.", actionOrange:""},
+      heteroagressivite:{label:"العدوانية تجاه الغير / العنف", actionRed:"تأمين سلامة المحيط. التهدئة. التوجيه إلى الطوارئ النفسية. النظر في شهادة الخطورة من أجل استشفاء إجباري عند الحاجة.", actionOrange:""},
+      depression:{label:"اكتئاب شديد مع خطر انتحاري", actionRed:"نفس تدبير الأزمة الانتحارية: إبعاد الوسائل الخطرة، التأمين، التوجيه إلى الطوارئ النفسية.", actionOrange:"التهدئة عند الحاجة. التوجيه لاستشارة نفسية."}
+    }
+  },
+
+  motifs: {
+    fr: {
+      suicidal:{label:"Idées suicidaires", def:"Pensées envahissantes centrées sur la mort ou le souhait de mourir, avec ou sans intention ni plan précis."},
+      agitation:{label:"Agitation", def:"Instabilité psychomotrice avec activité motrice et/ou verbale excessive, pouvant mettre le patient ou l'entourage en danger."},
+      confusion:{label:"Confusion", def:"Trouble aigu de la vigilance et de l'attention avec désorientation — d'origine organique jusqu'à preuve du contraire."},
+      anxiety:{label:"Anxiété aiguë", def:"Sensation intense et soudaine d'appréhension, avec manifestations physiques (palpitations, oppression, tremblements)."},
+      depressive:{label:"Symptômes dépressifs", def:"Tristesse persistante et/ou perte d'intérêt ou de plaisir, associées à des symptômes somatiques ou cognitifs."},
+      behavior:{label:"Troubles du comportement", def:"Modification inhabituelle et significative du comportement habituel du patient, sans étiquette diagnostique présupposée."},
+      somatic:{label:"Plainte somatique inexpliquée", def:"Symptôme physique rapporté par le patient sans cause organique identifiée à ce stade de l'évaluation."},
+      mania:{label:"Excitation ou exaltation de l'humeur", def:"Élévation inhabituelle de l'humeur, accélération du débit de parole, réduction du besoin de sommeil ou désinhibition."},
+      psychosis:{label:"Hallucinations ou idées délirantes", def:"Perceptions sans objet réel, ou convictions erronées auxquelles le patient adhère fermement."},
+      foodrefusal:{label:"Refus de s'alimenter", def:"Refus volontaire ou involontaire de prendre des aliments et/ou des liquides sur une durée significative."},
+      intox:{label:"Intoxication aiguë", def:"Prise récente d'alcool ou de substances avec retentissement clinique observable."},
+      violence:{label:"Violence ou agressivité", def:"Comportement menaçant ou geste agressif envers autrui, mettant en danger l'entourage ou le soignant."}
+    },
+    en: {
+      suicidal:{label:"Suicidal ideation", def:"Intrusive thoughts centered on death or the wish to die, with or without a specific intent or plan."},
+      agitation:{label:"Agitation", def:"Psychomotor instability with excessive motor and/or verbal activity, potentially endangering the patient or those around them."},
+      confusion:{label:"Confusion", def:"Acute disturbance of alertness and attention with disorientation — organic until proven otherwise."},
+      anxiety:{label:"Acute anxiety", def:"Intense, sudden feeling of apprehension, with physical manifestations (palpitations, chest tightness, tremors)."},
+      depressive:{label:"Depressive symptoms", def:"Persistent sadness and/or loss of interest or pleasure, with associated somatic or cognitive symptoms."},
+      behavior:{label:"Behavioral disturbance", def:"Unusual and significant change in the patient's usual behavior, without presupposing a diagnostic label."},
+      somatic:{label:"Unexplained somatic complaint", def:"Physical symptom reported by the patient with no organic cause identified at this stage of assessment."},
+      mania:{label:"Elevated or excited mood", def:"Unusually elevated mood, rapid speech, reduced need for sleep, or disinhibition."},
+      psychosis:{label:"Hallucinations or delusions", def:"Perceptions with no real object, or false convictions the patient firmly holds."},
+      foodrefusal:{label:"Refusal to eat", def:"Voluntary or involuntary refusal of food and/or fluids over a significant period."},
+      intox:{label:"Acute intoxication", def:"Recent use of alcohol or substances with observable clinical impact."},
+      violence:{label:"Violence or aggression", def:"Threatening behavior or aggressive act toward others, endangering those nearby or staff."}
+    },
+    ar: {
+      suicidal:{label:"أفكار انتحارية", def:"أفكار متسلطة تدور حول الموت أو الرغبة في الموت، مع وجود أو غياب نية أو خطة محددة."},
+      agitation:{label:"الهياج", def:"عدم استقرار حركي نفسي مع نشاط حركي و/أو كلامي مفرط، قد يعرّض المريض أو المحيطين به للخطر."},
+      confusion:{label:"التخليط الذهني", def:"اضطراب حاد في اليقظة والانتباه مع تشوش في التوجه — يُعتبر عضوي المنشأ حتى يثبت العكس."},
+      anxiety:{label:"قلق حاد", def:"شعور مفاجئ وشديد بالترقب، مصحوب بمظاهر جسدية (خفقان، ضيق في الصدر، رعشة)."},
+      depressive:{label:"أعراض اكتئابية", def:"حزن مستمر و/أو فقدان الاهتمام أو المتعة، مصحوب بأعراض جسدية أو معرفية."},
+      behavior:{label:"اضطراب في السلوك", def:"تغيّر غير معتاد وملحوظ في سلوك المريض المعتاد، دون افتراض تشخيص مسبق."},
+      somatic:{label:"شكوى جسدية غير مفسَّرة", def:"عرض جسدي يبلّغ عنه المريض دون تحديد سبب عضوي في هذه المرحلة من التقييم."},
+      mania:{label:"ارتفاع أو نشوة في المزاج", def:"ارتفاع غير معتاد في المزاج، تسارع في الكلام، تراجع الحاجة إلى النوم، أو فقدان التحفظ."},
+      psychosis:{label:"هلاوس أو أفكار وهامية", def:"إدراكات دون وجود موضوع حقيقي، أو قناعات خاطئة يتمسك بها المريض بشدة."},
+      foodrefusal:{label:"رفض التغذية", def:"رفض إرادي أو لا إرادي لتناول الطعام و/أو السوائل لفترة معتبرة."},
+      intox:{label:"تسمم حاد", def:"تعاطٍ حديث للكحول أو مواد مع تأثير سريري ملحوظ."},
+      violence:{label:"عنف أو عدوانية", def:"سلوك تهديدي أو فعل عدواني تجاه الآخرين، يعرّض المحيط أو الطاقم الطبي للخطر."}
+    }
+  },
+
+  motifAction: {
+    fr:{confusion:"🔴 Urgence somatique — bilan métabolique, ionique et inflammatoire complet. Vérifier les prises médicamenteuses et toxiques, l'historique médical. Imagerie cérébrale (± EEG). Éliminer une cause organique avant toute orientation psychiatrique."},
+    en:{confusion:"🔴 Somatic emergency — full metabolic, electrolyte and inflammatory work-up. Check medications and toxic exposure, medical history. Brain imaging (± EEG). Rule out an organic cause before any psychiatric orientation."},
+    ar:{confusion:"🔴 حالة إسعافية جسدية — إجراء تقييم استقلابي وكهرلي والتهابي كامل. التحقق من الأدوية والمواد السامة والتاريخ الطبي. تصوير دماغي (± تخطيط كهربائية الدماغ). استبعاد السبب العضوي قبل أي توجيه نفسي."}
+  },
+
+  signCategoryTitles: {
+    fr:{general:"Signes généraux / vitaux", neuro:"Signes neurologiques / moteurs", psy:"Signes psychiques / comportementaux", digestive:"Signes digestifs / nutritionnels", cardio:"Signes cardio-respiratoires", context:"Contexte"},
+    en:{general:"General / vital signs", neuro:"Neurological / motor signs", psy:"Psychiatric / behavioral signs", digestive:"Digestive / nutritional signs", cardio:"Cardio-respiratory signs", context:"Context"},
+    ar:{general:"علامات عامة / حيوية", neuro:"علامات عصبية / حركية", psy:"علامات نفسية / سلوكية", digestive:"علامات هضمية / تغذوية", cardio:"علامات قلبية تنفسية", context:"السياق"}
+  },
+
+  signs: {
+    fr: {
+      gen_fever:"Fièvre / hyperthermie", gen_tachycardia:"Tachycardie marquée", gen_bp:"Instabilité tensionnelle ou du pouls", gen_sweats:"Sueurs profuses", gen_bradycardia:"Bradycardie sévère (<40/min)", gen_hypotension:"Hypotension marquée",
+      neuro_confusion:"Confusion", neuro_rigidity:"Rigidité musculaire marquée", neuro_myoclonus:"Myoclonies", neuro_hyperreflexia:"Hyperréflexie", neuro_seizures:"Convulsions", neuro_tremor:"Tremblement majeur", neuro_consciousness:"Altération de la conscience",
+      psy_delusion_infant:"Idées délirantes centrées sur l'enfant", psy_hallucinations:"Hallucinations", psy_hallucinations_act:"Hallucinations avec passage à l'acte", psy_disorganization:"Désorganisation majeure du comportement", psy_dissociation:"Dissociation sévère", psy_posttrauma_confusion:"État confusionnel post-traumatique", psy_suicidal_ideas:"Idées suicidaires associées", psy_danger_self:"Mise en danger de soi", psy_danger_others:"Mise en danger d'autrui", psy_agitation_uncontrolled:"Agitation incontrôlable", psy_no_insight:"Absence totale de critique", psy_irritability:"Irritabilité marquée", psy_insomnia:"Insomnie sévère", psy_anxiety_no_delusion:"Anxiété majeure sans éléments délirants", psy_escalation:"Escalade comportementale malgré désamorçage verbal", psy_restraint_needed:"Nécessité de contention physique", psy_threat:"Menace envers autrui", psy_assault:"Passage à l'acte hétéro-agressif", psy_psychomotor_extreme:"Motricité extrême / instabilité psychomotrice majeure", psy_refuse_oral:"Refus de la voie orale pour le traitement", psy_spending:"Dépenses excessives inhabituelles", psy_sexual_disinhibition:"Désinhibition sexuelle", psy_sleep_reduced:"Réduction marquée du besoin de sommeil", psy_immobility:"Immobilité prolongée", psy_negativism:"Négativisme marqué (refuse toute consigne)", psy_suicide_plan:"Idéation suicidaire active avec plan précis", psy_recent_attempt:"Antécédent de tentative de suicide récente (<1 an)", psy_no_protection:"Absence de moyens de protection disponibles", psy_sadness_no_risk:"Tristesse intense sans risque suicidaire immédiat",
+      dig_refuse_total:"Refus alimentaire total (incluant les liquides)", dig_refuse_partial:"Refus alimentaire partiel", dig_vomiting:"Vomissements provoqués", dig_weight_loss_severe:"Perte de poids rapide et sévère", dig_weight_loss_stable:"Amaigrissement significatif mais stable", dig_dehydration:"Déshydratation clinique (muqueuses sèches, pli cutané)", dig_electrolyte:"Troubles ioniques connus", dig_amenorrhea:"Aménorrhée (chez la femme)", dig_constipation:"Constipation sévère", dig_diarrhea:"Diarrhée",
+      cardio_chestpain:"Douleur thoracique", cardio_dyspnea:"Dyspnée franche", cardio_history:"Antécédents cardiaques", cardio_ecg:"ECG anormal ou non fait", cardio_fear_death:"Peur de mourir intense", cardio_choking:"Sensation d'étouffement", cardio_brief:"Épisode bref (<30 min) à résolution spontanée", cardio_recurrent:"Antécédents d'épisodes similaires", cardio_syncope:"Syncope",
+      ctx_postpartum:"Début dans les 2 semaines post-partum", ctx_neuroleptic:"Traitement neuroleptique récent ou augmenté", ctx_serotonergic:"Traitement sérotoninergique récent ou association à risque", ctx_withdrawal:"Contexte de sevrage (alcool / benzodiazépines)", ctx_trauma:"Traumatisme psychique récent", ctx_toxicology:"Signes de gravité toxicologique (intoxication aiguë)"
+    },
+    en: {
+      gen_fever:"Fever / hyperthermia", gen_tachycardia:"Marked tachycardia", gen_bp:"Blood pressure or pulse instability", gen_sweats:"Profuse sweating", gen_bradycardia:"Severe bradycardia (<40/min)", gen_hypotension:"Marked hypotension",
+      neuro_confusion:"Confusion", neuro_rigidity:"Marked muscle rigidity", neuro_myoclonus:"Myoclonus", neuro_hyperreflexia:"Hyperreflexia", neuro_seizures:"Seizures", neuro_tremor:"Marked tremor", neuro_consciousness:"Altered consciousness",
+      psy_delusion_infant:"Delusions centered on the infant", psy_hallucinations:"Hallucinations", psy_hallucinations_act:"Hallucinations with acting-out", psy_disorganization:"Major behavioral disorganization", psy_dissociation:"Severe dissociation", psy_posttrauma_confusion:"Post-traumatic confusional state", psy_suicidal_ideas:"Associated suicidal ideas", psy_danger_self:"Danger to self", psy_danger_others:"Danger to others", psy_agitation_uncontrolled:"Uncontrollable agitation", psy_no_insight:"Complete lack of insight", psy_irritability:"Marked irritability", psy_insomnia:"Severe insomnia", psy_anxiety_no_delusion:"Major anxiety without delusional features", psy_escalation:"Behavioral escalation despite verbal de-escalation", psy_restraint_needed:"Physical restraint required", psy_threat:"Threat toward others", psy_assault:"Hetero-aggressive acting-out", psy_psychomotor_extreme:"Extreme motor activity / major psychomotor instability", psy_refuse_oral:"Refusal of oral treatment", psy_spending:"Unusual excessive spending", psy_sexual_disinhibition:"Sexual disinhibition", psy_sleep_reduced:"Markedly reduced need for sleep", psy_immobility:"Prolonged immobility", psy_negativism:"Marked negativism (refuses all instructions)", psy_suicide_plan:"Active suicidal ideation with a specific plan", psy_recent_attempt:"Recent suicide attempt (<1 year)", psy_no_protection:"No protective measures available", psy_sadness_no_risk:"Intense sadness without immediate suicide risk",
+      dig_refuse_total:"Total food refusal (including fluids)", dig_refuse_partial:"Partial food refusal", dig_vomiting:"Self-induced vomiting", dig_weight_loss_severe:"Rapid and severe weight loss", dig_weight_loss_stable:"Significant but stable weight loss", dig_dehydration:"Clinical dehydration (dry mucosa, skin fold sign)", dig_electrolyte:"Known electrolyte disturbances", dig_amenorrhea:"Amenorrhea (in women)", dig_constipation:"Severe constipation", dig_diarrhea:"Diarrhea",
+      cardio_chestpain:"Chest pain", cardio_dyspnea:"Marked dyspnea", cardio_history:"Cardiac history", cardio_ecg:"Abnormal or missing ECG", cardio_fear_death:"Intense fear of dying", cardio_choking:"Choking sensation", cardio_brief:"Brief episode (<30 min), spontaneous resolution", cardio_recurrent:"History of similar episodes", cardio_syncope:"Syncope",
+      ctx_postpartum:"Onset within 2 weeks postpartum", ctx_neuroleptic:"Recent or increased antipsychotic treatment", ctx_serotonergic:"Recent serotonergic treatment or risky drug combination", ctx_withdrawal:"Withdrawal context (alcohol / benzodiazepines)", ctx_trauma:"Recent psychological trauma", ctx_toxicology:"Signs of toxicological severity (acute intoxication)"
+    },
+    ar: {
+      gen_fever:"حمى / فرط حرارة", gen_tachycardia:"تسرع نبض ملحوظ", gen_bp:"عدم استقرار ضغط الدم أو النبض", gen_sweats:"تعرق غزير", gen_bradycardia:"بطء قلب شديد (أقل من 40/د)", gen_hypotension:"انخفاض ضغط الدم الملحوظ",
+      neuro_confusion:"تخليط ذهني", neuro_rigidity:"تصلب عضلي ملحوظ", neuro_myoclonus:"رمع عضلي", neuro_hyperreflexia:"فرط المنعكسات", neuro_seizures:"تشنجات", neuro_tremor:"رعاش شديد", neuro_consciousness:"اضطراب في الوعي",
+      psy_delusion_infant:"أفكار وهامية تتمحور حول الرضيع", psy_hallucinations:"هلاوس", psy_hallucinations_act:"هلاوس مصحوبة بالتصرف بناءً عليها", psy_disorganization:"تفكك كبير في السلوك", psy_dissociation:"انفصام شديد", psy_posttrauma_confusion:"حالة تخليط ذهني بعد الصدمة", psy_suicidal_ideas:"أفكار انتحارية مرافقة", psy_danger_self:"تعريض النفس للخطر", psy_danger_others:"تعريض الآخرين للخطر", psy_agitation_uncontrolled:"هياج لا يمكن السيطرة عليه", psy_no_insight:"غياب تام للوعي بالمرض", psy_irritability:"تهيج ملحوظ", psy_insomnia:"أرق شديد", psy_anxiety_no_delusion:"قلق شديد دون عناصر وهامية", psy_escalation:"تصاعد سلوكي رغم محاولات التهدئة اللفظية", psy_restraint_needed:"الحاجة إلى تقييد جسدي", psy_threat:"تهديد للآخرين", psy_assault:"تصرف عدواني تجاه الغير", psy_psychomotor_extreme:"نشاط حركي مفرط / عدم استقرار حركي نفسي كبير", psy_refuse_oral:"رفض تناول العلاج عن طريق الفم", psy_spending:"إنفاق مفرط غير معتاد", psy_sexual_disinhibition:"تحرر جنسي غير معتاد", psy_sleep_reduced:"تراجع ملحوظ في الحاجة إلى النوم", psy_immobility:"جمود حركي مطوّل", psy_negativism:"سلبية ملحوظة (يرفض تنفيذ أي تعليمات)", psy_suicide_plan:"أفكار انتحارية فعّالة مع خطة محددة", psy_recent_attempt:"محاولة انتحار حديثة (أقل من سنة)", psy_no_protection:"غياب وسائل حماية متاحة", psy_sadness_no_risk:"حزن شديد دون خطر انتحاري مباشر",
+      dig_refuse_total:"رفض كلي للتغذية (بما في ذلك السوائل)", dig_refuse_partial:"رفض جزئي للتغذية", dig_vomiting:"تقيؤ مُفتعل", dig_weight_loss_severe:"فقدان وزن سريع وشديد", dig_weight_loss_stable:"نقص وزن ملحوظ لكن مستقر", dig_dehydration:"جفاف سريري (جفاف الأغشية المخاطية، علامة طية الجلد)", dig_electrolyte:"اضطرابات كهارل معروفة", dig_amenorrhea:"انقطاع الطمث (عند المرأة)", dig_constipation:"إمساك شديد", dig_diarrhea:"إسهال",
+      cardio_chestpain:"ألم صدري", cardio_dyspnea:"ضيق نفس واضح", cardio_history:"سوابق قلبية", cardio_ecg:"تخطيط قلب غير طبيعي أو غير منجز", cardio_fear_death:"خوف شديد من الموت", cardio_choking:"إحساس بالاختناق", cardio_brief:"نوبة قصيرة (أقل من 30 د) تزول تلقائياً", cardio_recurrent:"سوابق نوبات مشابهة", cardio_syncope:"إغماء",
+      ctx_postpartum:"بداية الأعراض خلال أسبوعين بعد الولادة", ctx_neuroleptic:"علاج مضاد ذهاني حديث أو تمت زيادة جرعته", ctx_serotonergic:"علاج سيروتونيني حديث أو تداخل دوائي خطير", ctx_withdrawal:"سياق انسحاب (كحول / بنزوديازيبينات)", ctx_trauma:"صدمة نفسية حديثة", ctx_toxicology:"علامات خطورة سمّية (تسمم حاد)"
+    }
+  },
+
+  mse: {
+    fr:{
+      presentation:{label:"Présentation", options:{well_kept:"Soignée", neglected:"Négligée", unusual:"Inhabituelle"}},
+      contact:{label:"Contact (relation avec l'examinateur)", options:{easy:"Facile", avoidant:"Fuyant (évite le regard)", intrusive:"Envahissant", absent:"Absent"}},
+      psychomoteur:{label:"Comportement moteur", options:{normal:"Normal", agitated:"Agité", slowed:"Ralenti", repetitive:"Gestes répétitifs"}},
+      discours:{label:"Discours", options:{normal:"Normal", slow:"Ralenti", fast:"Trop rapide", incoherent:"Incohérent", mutism:"Absence de parole (mutisme)"}},
+      humeur:{label:"Humeur", options:{neutral:"Neutre", sad:"Triste", euphoric:"Trop joyeuse (euphorique)", irritable:"Irritable", angry:"En colère", anxious:"Anxieuse", elated:"Exaltée"}},
+      affect:{label:"Expression des émotions (affect)", options:{appropriate:"Adaptée", inappropriate:"Inadaptée", blunted:"Peu expressive", labile:"Changeante"}},
+      coursPensee:{label:"Façon d'enchaîner les idées", options:{coherent:"Cohérente", loose:"Décousue", racing:"Idées qui s'enchaînent trop vite", blocking:"Blocages soudains du discours"}},
+      contenuPensee:{label:"Contenu de la pensée", options:{normal:"Normal", delusions:"Fausses convictions (idées délirantes)", obsessions:"Pensées envahissantes (obsessions)", persecution:"Se sent persécuté"}},
+      perception:{label:"Perceptions", options:{normal:"Normales", auditory:"Entend des voix ou des sons", visual:"Voit des choses", other:"Autres"}},
+      cognition:{label:"Orientation et attention", options:{normal:"Normale", time:"Ne connaît pas la date/l'heure", place:"Ne sait pas où il/elle est", attention:"Difficulté à se concentrer"}},
+      insight:{label:"Conscience du trouble", options:{good:"Bonne", partial:"Partielle", absent:"Absente"}}
+    },
+    en:{
+      presentation:{label:"Appearance", options:{well_kept:"Well-kept", neglected:"Neglected", unusual:"Unusual"}},
+      contact:{label:"Rapport (relationship with examiner)", options:{easy:"Easy", avoidant:"Avoidant (avoids eye contact)", intrusive:"Intrusive", absent:"Absent"}},
+      psychomoteur:{label:"Motor behavior", options:{normal:"Normal", agitated:"Agitated", slowed:"Slowed", repetitive:"Repetitive movements"}},
+      discours:{label:"Speech", options:{normal:"Normal", slow:"Slow", fast:"Too fast", incoherent:"Incoherent", mutism:"No speech (mutism)"}},
+      humeur:{label:"Mood", options:{neutral:"Neutral", sad:"Sad", euphoric:"Overly cheerful (euphoric)", irritable:"Irritable", angry:"Angry", anxious:"Anxious", elated:"Elated"}},
+      affect:{label:"Emotional expression (affect)", options:{appropriate:"Appropriate", inappropriate:"Inappropriate", blunted:"Blunted", labile:"Labile"}},
+      coursPensee:{label:"Thought process (flow of ideas)", options:{coherent:"Coherent", loose:"Loose / disjointed", racing:"Ideas racing too fast", blocking:"Sudden thought blocking"}},
+      contenuPensee:{label:"Thought content", options:{normal:"Normal", delusions:"False convictions (delusions)", obsessions:"Intrusive thoughts (obsessions)", persecution:"Feels persecuted"}},
+      perception:{label:"Perceptions", options:{normal:"Normal", auditory:"Hears voices or sounds", visual:"Sees things", other:"Other"}},
+      cognition:{label:"Orientation and attention", options:{normal:"Normal", time:"Doesn't know the date/time", place:"Doesn't know where they are", attention:"Difficulty concentrating"}},
+      insight:{label:"Insight", options:{good:"Good", partial:"Partial", absent:"Absent"}}
+    },
+    ar:{
+      presentation:{label:"المظهر العام", options:{well_kept:"مُعتنى به", neglected:"مُهمل", unusual:"غير معتاد"}},
+      contact:{label:"التواصل (العلاقة مع الفاحص)", options:{easy:"سهل", avoidant:"متجنب (يتفادى التواصل البصري)", intrusive:"تطفلي", absent:"غائب"}},
+      psychomoteur:{label:"السلوك الحركي", options:{normal:"طبيعي", agitated:"مهتاج", slowed:"بطيء", repetitive:"حركات متكررة"}},
+      discours:{label:"الكلام", options:{normal:"طبيعي", slow:"بطيء", fast:"سريع جداً", incoherent:"غير مترابط", mutism:"غياب الكلام (صمت تام)"}},
+      humeur:{label:"المزاج", options:{neutral:"محايد", sad:"حزين", euphoric:"مبتهج بشكل مفرط (نشوة)", irritable:"سريع التهيج", angry:"غاضب", anxious:"قلق", elated:"متعالي / مبتهج بشدة"}},
+      affect:{label:"التعبير الانفعالي (الوجدان)", options:{appropriate:"مناسب", inappropriate:"غير مناسب", blunted:"محدود التعبير", labile:"متقلب"}},
+      coursPensee:{label:"طريقة تسلسل الأفكار", options:{coherent:"مترابط", loose:"غير مترابط", racing:"تسارع في تتابع الأفكار", blocking:"انقطاع مفاجئ في الكلام"}},
+      contenuPensee:{label:"محتوى الفكر", options:{normal:"طبيعي", delusions:"قناعات خاطئة (أفكار وهامية)", obsessions:"أفكار متسلطة (وسواس)", persecution:"يشعر بالاضطهاد"}},
+      perception:{label:"الإدراكات الحسية", options:{normal:"طبيعية", auditory:"يسمع أصواتاً", visual:"يرى أشياء", other:"أخرى"}},
+      cognition:{label:"التوجه والانتباه", options:{normal:"طبيعي", time:"لا يعرف التاريخ/الوقت", place:"لا يعرف أين هو/هي", attention:"صعوبة في التركيز"}},
+      insight:{label:"الوعي بالمرض", options:{good:"جيد", partial:"جزئي", absent:"غائب"}}
+    }
+  },
+
+  physio: {
+    fr:{cardio:"Cardiovasculaire", respi:"Respiratoire", digestif:"Digestif / abdominal", neuro:"Neurologique (nerfs crâniens, motricité, réflexes)", normal:"Normal", anomalie:"Anomalie"},
+    en:{cardio:"Cardiovascular", respi:"Respiratory", digestif:"Digestive / abdominal", neuro:"Neurological (cranial nerves, motor function, reflexes)", normal:"Normal", anomalie:"Abnormal"},
+    ar:{cardio:"القلب والأوعية الدموية", respi:"الجهاز التنفسي", digestif:"الجهاز الهضمي / البطن", neuro:"الجهاز العصبي (الأعصاب القحفية، الحركة، المنعكسات)", normal:"طبيعي", anomalie:"غير طبيعي"}
+  },
+
+  misc: {
+    fr:{
+      sexe:{h:"Homme", f:"Femme"},
+      situation:{single:"Célibataire", married:"Marié(e)", divorced:"Divorcé(e)", widowed:"Veuf/veuve", couple:"En couple"},
+      ouiNon:{yes:"Oui", no:"Non", unspecified:"Non précisé"},
+      lienParente:{parents:"Parents", siblings:"Fratrie", collateral:"Collatéraux"},
+      atcdPsyIndiv:{depression:"Dépression", bipolar:"Trouble bipolaire", psychotic:"Schizophrénie / trouble psychotique", anxiety:"Trouble anxieux", addiction:"Addiction (alcool/substances)", attempt:"Tentative de suicide antérieure", selfharm:"Automutilation"},
+      atcdPsyFam:{depression:"Dépression", bipolar:"Trouble bipolaire", schizophrenia:"Schizophrénie", suicide:"Suicide dans la famille", addiction:"Addiction"},
+      atcdSom:{cancer:"Cancer", hta:"HTA", cardiopathy:"Cardiopathie", diabetes:"Diabète", neuro:"Neurologique", autoimmune:"Auto-immune", other:"Autre"},
+      modeDebut:{recent:"Récent", sudden:"Soudain", progressive:"Progressif"},
+      declencheurs:{none:"Aucun identifié", grief:"Deuil", breakup:"Rupture sentimentale", work_stress:"Stress professionnel", postpartum:"Post-partum", substance:"Consommation de substance", family_conflict:"Conflit familial", recent_illness:"Maladie somatique récente"}
+    },
+    en:{
+      sexe:{h:"Male", f:"Female"},
+      situation:{single:"Single", married:"Married", divorced:"Divorced", widowed:"Widowed", couple:"In a relationship"},
+      ouiNon:{yes:"Yes", no:"No", unspecified:"Unspecified"},
+      lienParente:{parents:"Parents", siblings:"Siblings", collateral:"Extended family"},
+      atcdPsyIndiv:{depression:"Depression", bipolar:"Bipolar disorder", psychotic:"Schizophrenia / psychotic disorder", anxiety:"Anxiety disorder", addiction:"Addiction (alcohol/substances)", attempt:"Previous suicide attempt", selfharm:"Self-harm"},
+      atcdPsyFam:{depression:"Depression", bipolar:"Bipolar disorder", schizophrenia:"Schizophrenia", suicide:"Suicide in the family", addiction:"Addiction"},
+      atcdSom:{cancer:"Cancer", hta:"Hypertension", cardiopathy:"Heart disease", diabetes:"Diabetes", neuro:"Neurological", autoimmune:"Autoimmune", other:"Other"},
+      modeDebut:{recent:"Recent", sudden:"Sudden", progressive:"Progressive"},
+      declencheurs:{none:"None identified", grief:"Bereavement", breakup:"Relationship breakup", work_stress:"Work-related stress", postpartum:"Postpartum", substance:"Substance use", family_conflict:"Family conflict", recent_illness:"Recent physical illness"}
+    },
+    ar:{
+      sexe:{h:"ذكر", f:"أنثى"},
+      situation:{single:"أعزب", married:"متزوج(ة)", divorced:"مطلّق(ة)", widowed:"أرمل(ة)", couple:"في علاقة"},
+      ouiNon:{yes:"نعم", no:"لا", unspecified:"غير محدد"},
+      lienParente:{parents:"الوالدان", siblings:"الإخوة", collateral:"الأقارب (عمومة/خؤولة)"},
+      atcdPsyIndiv:{depression:"اكتئاب", bipolar:"اضطراب ثنائي القطب", psychotic:"فصام / اضطراب ذهاني", anxiety:"اضطراب قلق", addiction:"إدمان (كحول/مواد)", attempt:"محاولة انتحار سابقة", selfharm:"إيذاء النفس"},
+      atcdPsyFam:{depression:"اكتئاب", bipolar:"اضطراب ثنائي القطب", schizophrenia:"فصام", suicide:"انتحار في العائلة", addiction:"إدمان"},
+      atcdSom:{cancer:"سرطان", hta:"ارتفاع ضغط الدم", cardiopathy:"مرض قلبي", diabetes:"سكري", neuro:"عصبي", autoimmune:"مناعي ذاتي", other:"آخر"},
+      modeDebut:{recent:"حديث", sudden:"مفاجئ", progressive:"تدريجي"},
+      declencheurs:{none:"لا يوجد محدد", grief:"فقدان (حِداد)", breakup:"انفصال عاطفي", work_stress:"ضغط مهني", postpartum:"ما بعد الولادة", substance:"تعاطي مواد", family_conflict:"نزاع عائلي", recent_illness:"مرض جسدي حديث"}
+    }
+  }
+};
+
+// L(dict, key [, subkey]) — translation lookup with French fallback
+function L(dict, key, subkey){
+  const bucket = (CLINICAL_I18N[dict] && (CLINICAL_I18N[dict][currentLang] || CLINICAL_I18N[dict].fr)) || {};
+  const entry = bucket[key];
+  if(entry===undefined) return key;
+  if(subkey===undefined) return entry;
+  return (entry[subkey]!==undefined) ? entry[subkey] : key;
+}
+function Lmisc(group, key){
+  const bucket = (CLINICAL_I18N.misc[currentLang] || CLINICAL_I18N.misc.fr)[group] || {};
+  return bucket[key]!==undefined ? bucket[key] : key;
+}
+
+// ---- stable key lists driving logic & rendering order ----
+const MOTIF_KEYS = ["suicidal","agitation","confusion","anxiety","depressive","behavior","somatic","mania","psychosis","foodrefusal","intox","violence"];
+const MOTIF_COLOR = { suicidal:"rouge", agitation:"rouge", confusion:"rouge", anxiety:"orange", depressive:"orange", behavior:"orange", somatic:"jaune", mania:"orange", psychosis:"rouge", foodrefusal:"orange", intox:"rouge", violence:"rouge" };
+
+const SIGN_CATEGORY_DEFS = [
+  {key:"general", items:["gen_fever","gen_tachycardia","gen_bp","gen_sweats","gen_bradycardia","gen_hypotension"]},
+  {key:"neuro", items:["neuro_confusion","neuro_rigidity","neuro_myoclonus","neuro_hyperreflexia","neuro_seizures","neuro_tremor","neuro_consciousness"]},
+  {key:"psy", items:["psy_delusion_infant","psy_hallucinations","psy_hallucinations_act","psy_disorganization","psy_dissociation","psy_posttrauma_confusion","psy_suicidal_ideas","psy_danger_self","psy_danger_others","psy_agitation_uncontrolled","psy_no_insight","psy_irritability","psy_insomnia","psy_anxiety_no_delusion","psy_escalation","psy_restraint_needed","psy_threat","psy_assault","psy_psychomotor_extreme","psy_refuse_oral","psy_spending","psy_sexual_disinhibition","psy_sleep_reduced","psy_immobility","psy_negativism","psy_suicide_plan","psy_recent_attempt","psy_no_protection","psy_sadness_no_risk"]},
+  {key:"digestive", items:["dig_refuse_total","dig_refuse_partial","dig_vomiting","dig_weight_loss_severe","dig_weight_loss_stable","dig_dehydration","dig_electrolyte","dig_amenorrhea","dig_constipation","dig_diarrhea"]},
+  {key:"cardio", items:["cardio_chestpain","cardio_dyspnea","cardio_history","cardio_ecg","cardio_fear_death","cardio_choking","cardio_brief","cardio_recurrent","cardio_syncope"]},
+  {key:"context", items:["ctx_postpartum","ctx_neuroleptic","ctx_serotonergic","ctx_withdrawal","ctx_trauma","ctx_toxicology"]}
+];
+
+const SIGN_WEIGHTS = {
+  gen_fever:{syndromemalin:2, serotoninergique:2, sevrage:2},
+  gen_tachycardia:{sevrage:2, serotoninergique:1},
+  gen_bp:{syndromemalin:2},
+  gen_sweats:{serotoninergique:2, sevrage:2},
+  gen_bradycardia:{alimentaire:2},
+  gen_hypotension:{alimentaire:2},
+  neuro_confusion:{puerperale:2, sevrage:2},
+  neuro_rigidity:{syndromemalin:2},
+  neuro_myoclonus:{serotoninergique:2},
+  neuro_hyperreflexia:{serotoninergique:2},
+  neuro_seizures:{sevrage:2},
+  neuro_tremor:{sevrage:2},
+  neuro_consciousness:{syndromemalin:2, intoxication:2},
+  psy_delusion_infant:{puerperale:2},
+  psy_hallucinations:{puerperale:2, sevrage:2},
+  psy_hallucinations_act:{psychoseaigue:2},
+  psy_disorganization:{puerperale:2, psychoseaigue:2},
+  psy_dissociation:{stressaigu:2},
+  psy_posttrauma_confusion:{stressaigu:2},
+  psy_suicidal_ideas:{stressaigu:2},
+  psy_danger_self:{suicide:2, depression:1, puerperale:1, psychoseaigue:1, stressaigu:1},
+  psy_danger_others:{heteroagressivite:2, agitation:2, psychoseaigue:1, puerperale:1},
+  psy_agitation_uncontrolled:{psychoseaigue:2},
+  psy_no_insight:{psychoseaigue:2},
+  psy_irritability:{puerperale:1},
+  psy_insomnia:{puerperale:1},
+  psy_anxiety_no_delusion:{puerperale:1},
+  psy_escalation:{agitation:2},
+  psy_restraint_needed:{agitation:2, heteroagressivite:1},
+  psy_threat:{heteroagressivite:1, agitation:1},
+  psy_assault:{heteroagressivite:2, agitation:1},
+  psy_psychomotor_extreme:{maniaque:2},
+  psy_refuse_oral:{maniaque:1},
+  psy_spending:{maniaque:1},
+  psy_sexual_disinhibition:{maniaque:1},
+  psy_sleep_reduced:{maniaque:2},
+  psy_immobility:{catatonie:2},
+  psy_negativism:{catatonie:2},
+  psy_suicide_plan:{suicide:2, depression:2},
+  psy_recent_attempt:{suicide:2},
+  psy_no_protection:{suicide:1},
+  psy_sadness_no_risk:{depression:1},
+  dig_refuse_total:{alimentaire:2},
+  dig_refuse_partial:{alimentaire:1},
+  dig_vomiting:{alimentaire:2},
+  dig_weight_loss_severe:{alimentaire:2},
+  dig_weight_loss_stable:{alimentaire:1},
+  dig_dehydration:{alimentaire:2},
+  dig_electrolyte:{alimentaire:2},
+  dig_amenorrhea:{alimentaire:1},
+  dig_constipation:{alimentaire:1},
+  dig_diarrhea:{serotoninergique:1},
+  cardio_chestpain:{panique:2},
+  cardio_dyspnea:{panique:2},
+  cardio_history:{panique:2},
+  cardio_ecg:{panique:2, intoxication:1},
+  cardio_fear_death:{panique:1},
+  cardio_choking:{panique:1},
+  cardio_brief:{panique:1},
+  cardio_recurrent:{panique:1},
+  cardio_syncope:{alimentaire:1, panique:1},
+  ctx_postpartum:{puerperale:2},
+  ctx_neuroleptic:{syndromemalin:2, catatonie:1},
+  ctx_serotonergic:{serotoninergique:2},
+  ctx_withdrawal:{sevrage:1},
+  ctx_trauma:{stressaigu:1},
+  ctx_toxicology:{intoxication:2}
+};
+
+function computeUrgenceMatch(checked){
+  const scores = {};
+  Object.keys(CLINICAL_I18N.urgence.fr).forEach(k=>{ scores[k] = {score:0, hasRed:false}; });
+  checked.forEach(sign=>{
+    const map = SIGN_WEIGHTS[sign];
+    if(!map) return;
+    Object.entries(map).forEach(([cond,w])=>{
+      if(!scores[cond]) return;
+      scores[cond].score += w;
+      if(w===2) scores[cond].hasRed = true;
+    });
+  });
+  const ranked = Object.entries(scores).filter(([,v])=>v.score>0).sort((a,b)=>b[1].score-a[1].score);
+  return ranked;
+}
+
+const COLOR_RANK = {rouge:3, orange:2, jaune:1};
+const COLOR_LABEL_I18N = {
+  fr: { rouge:"🔴 Urgent — adresser immédiatement aux urgences psychiatriques", orange:"🟠 Adresser au psychiatre en consultation ambulatoire", jaune:"🟡 Mettre en place une prise en charge de première ligne, puis demander un avis en psychiatrie" },
+  en: { rouge:"🔴 Urgent — refer immediately to psychiatric emergency care", orange:"🟠 Refer to a psychiatrist for outpatient consultation", jaune:"🟡 Start first-line management, then request a psychiatric opinion" },
+  ar: { rouge:"🔴 عاجل — التوجيه فوراً إلى الطوارئ النفسية", orange:"🟠 التوجيه لاستشارة طبيب نفسي في العيادة الخارجية", jaune:"🟡 البدء بتدبير أولي، ثم طلب استشارة نفسية" }
+};
+const COLOR_LABEL = new Proxy({}, { get(_, prop){ return (COLOR_LABEL_I18N[currentLang]||COLOR_LABEL_I18N.fr)[prop]; } });
+
+function worstColor(colors){
+  return colors.reduce((worst,c)=> (COLOR_RANK[c]||0) > (COLOR_RANK[worst]||0) ? c : worst, colors[0]||'jaune');
+}
+function pickMotifRecommendation(chips){
+  if(chips.length===0) return {color:'jaune', text: COLOR_LABEL['jaune']};
+  const color = worstColor(chips.map(m=>MOTIF_COLOR[m]||'jaune'));
+  const worstMotifs = chips.filter(m=>(MOTIF_COLOR[m]||'jaune')===color);
+  const withOverride = worstMotifs.find(m=>CLINICAL_I18N.motifAction[currentLang] && CLINICAL_I18N.motifAction[currentLang][m]);
+  return {color, text: withOverride ? CLINICAL_I18N.motifAction[currentLang][withOverride] : COLOR_LABEL[color]};
+}
+
+const OUI_NON_KEYS = ["yes","no","unspecified"];
+const LIEN_PARENTE_KEYS = ["parents","siblings","collateral"];
+const ATCD_PSY_INDIV_KEYS = ["depression","bipolar","psychotic","anxiety","addiction","attempt","selfharm"];
+const ATCD_PSY_FAM_KEYS = ["depression","bipolar","schizophrenia","suicide","addiction"];
+const ATCD_SOM_KEYS = ["cancer","hta","cardiopathy","diabetes","neuro","autoimmune","other"];
+const MODE_DEBUT_KEYS = ["recent","sudden","progressive"];
+const DECLENCHEURS_KEYS = ["none","grief","breakup","work_stress","postpartum","substance","family_conflict","recent_illness"];
+const SEXE_KEYS = ["h","f"];
+const SITUATION_KEYS = ["single","married","divorced","widowed","couple"];
+
+const MSE_DOMAINS = [
+  {key:'presentation'}, {key:'contact'}, {key:'psychomoteur'}, {key:'discours'}, {key:'humeur'},
+  {key:'affect'}, {key:'coursPensee'}, {key:'contenuPensee'}, {key:'perception'}, {key:'cognition'}, {key:'insight'}
+];
+const MSE_OPTION_KEYS = {
+  presentation:['well_kept','neglected','unusual'],
+  contact:['easy','avoidant','intrusive','absent'],
+  psychomoteur:['normal','agitated','slowed','repetitive'],
+  discours:['normal','slow','fast','incoherent','mutism'],
+  humeur:['neutral','sad','euphoric','irritable','angry','anxious','elated'],
+  affect:['appropriate','inappropriate','blunted','labile'],
+  coursPensee:['coherent','loose','racing','blocking'],
+  contenuPensee:['normal','delusions','obsessions','persecution'],
+  perception:['normal','auditory','visual','other'],
+  cognition:['normal','time','place','attention'],
+  insight:['good','partial','absent']
+};
+
+const PHYSIO_SYSTEMS = [{key:'cardio'},{key:'respi'},{key:'digestif'},{key:'neuro'}];
+
+function wizardSetBody(html){ document.getElementById('wizardBody').innerHTML = html; }
+function multiRowHTML(id, options, selected){
+  return `<div class="choice-row" id="${id}">${options.map(o=>`<div class="choice${(selected||[]).includes(o)?' selected':''}" data-value="${o}">${o}</div>`).join('')}</div>`;
+}
+function multiRowHTMLi18n(id, keys, selected, labelFn){
+  return `<div class="choice-row" id="${id}">${keys.map(k=>`<div class="choice${(selected||[]).includes(k)?' selected':''}" data-value="${k}">${labelFn(k)}</div>`).join('')}</div>`;
+}
+function bindMultiRow(id, onChange){
+  document.getElementById(id).querySelectorAll('.choice').forEach(ch=>{
+    ch.addEventListener('click', ()=>{ ch.classList.toggle('selected'); if(onChange) onChange(); });
+  });
+}
+function readMultiRow(id){
+  const row = document.getElementById(id);
+  return row ? [...row.querySelectorAll('.choice.selected')].map(c=>c.dataset.value) : [];
+}
+function singleRowHTML(id, options, selected){
+  return `<div class="choice-row" id="${id}">${options.map(o=>`<div class="choice${selected===o?' selected':''}" data-value="${o}">${o}</div>`).join('')}</div>`;
+}
+function singleRowHTMLi18n(id, keys, selected, labelFn){
+  return `<div class="choice-row" id="${id}">${keys.map(k=>`<div class="choice${selected===k?' selected':''}" data-value="${k}">${labelFn(k)}</div>`).join('')}</div>`;
+}
+function bindSingleRow(id, onChange){
+  const row = document.getElementById(id);
+  row.querySelectorAll('.choice').forEach(ch=>{
+    ch.addEventListener('click', ()=>{
+      row.querySelectorAll('.choice').forEach(c=>c.classList.remove('selected'));
+      ch.classList.add('selected');
+      if(onChange) onChange(ch.dataset.value);
+    });
+  });
+}
+function readSingleRow(id){
+  const row = document.getElementById(id);
+  const sel = row?.querySelector('.choice.selected');
+  return sel ? sel.dataset.value : '';
+}
+
+let wizardStepNum = 1;
+function WIZARD_TITLES_LIST(){ return [t('wStep1'), t('wStep2'), t('wStep3'), t('wStep4'), t('wStep5')]; }
+const WIZARD_TOTAL = 5;
+
+function updateMotifBadge(){
+  const selected = readMultiRow('uMotifChips');
+  const badge = document.getElementById('motifBadge');
+  const defsBox = document.getElementById('motifDefs');
+  if(!badge) return;
+  if(defsBox){
+    defsBox.innerHTML = selected.length ? `<div class="card" style="margin-top:10px;">${selected.map(m=>`
+      <div style="margin-bottom:8px;"><strong style="font-size:17.5px;">${L('motifs',m,'label')}</strong><p class="hint" style="margin:2px 0 0;">${L('motifs',m,'def')}</p></div>
+    `).join('')}</div>` : '';
+  }
+  if(selected.length===0){
+    badge.className = 'verdict v-unclear';
+    badge.textContent = "Sélectionnez au moins un motif pour une orientation indicative.";
+    window.lastMotifColor = 'jaune';
+    window.lastMotifText = '';
+    return;
+  }
+  const {color, text} = pickMotifRecommendation(selected);
+  window.lastMotifColor = color;
+  window.lastMotifText = text;
+  badge.className = 'verdict ' + (color==='rouge'?'v-organic':color==='orange'?'v-orange':'v-functional');
+  badge.textContent = text + " (orientation indicative — à confirmer par l'examen)";
+}
+
+function renderWizardStep(){
+  document.getElementById('wizardTitle').textContent = WIZARD_TITLES_LIST()[wizardStepNum-1];
+  const stepWord = currentLang==='ar' ? 'خطوة' : (currentLang==='en' ? 'Step' : 'Étape');
+  document.getElementById('wizardProgress').textContent = `${stepWord} ${wizardStepNum}/${WIZARD_TOTAL}`;
+  document.getElementById('wizardFill').style.width = (wizardStepNum/WIZARD_TOTAL*100)+'%';
+  document.getElementById('wizardPrev').style.visibility = 'visible';
+  document.getElementById('wizardPrev').textContent = wizardStepNum===1 ? ('‹ '+t('home')) : t('wPrev');
+  document.getElementById('wizardNext').textContent = wizardStepNum===WIZARD_TOTAL ? t('wNextLast') : t('wNext');
+
+  if(wizardStepNum===1){
+    wizardSetBody(`
+      <p class="hint">Sans nom ni prénom — utilisez uniquement la référence dossier définie à l'accueil.</p>
+      <div class="vital-grid">
+        <div><label class="first">${t('wAge')}</label><input type="text" id="uCivilAge" value="${urg.civil.age}" placeholder="ex : 34 ans"></div>
+        <div><label class="first">${t('wProfession')}</label><input type="text" id="uCivilProf" value="${urg.civil.profession}"></div>
+      </div>
+      <label>${t('wSexe')}</label>${singleRowHTMLi18n('uCivilSexe', SEXE_KEYS, urg.civil.sexe, k=>Lmisc('sexe',k))}
+      <label>${t('wSituation')}</label>${singleRowHTMLi18n('uCivilSituation', SITUATION_KEYS, urg.civil.situation, k=>Lmisc('situation',k))}
+
+      <label class="first">${t('wMotif')}</label>
+      ${multiRowHTMLi18n('uMotifChips', MOTIF_KEYS, urg.motifChips, k=>L('motifs',k,'label'))}
+      <div id="motifDefs"></div>
+      <div class="verdict v-unclear" id="motifBadge" style="margin-top:12px;">Sélectionnez au moins un motif pour une orientation indicative.</div>
+      <label>${t('wPrecisions')}</label>
+      <textarea id="uMotif" placeholder="Détails exprimés par le patient ou l'entourage">${urg.motif}</textarea>
+    `);
+    bindSingleRow('uCivilSexe'); bindSingleRow('uCivilSituation');
+    bindMultiRow('uMotifChips', updateMotifBadge);
+    updateMotifBadge();
+  }
+  else if(wizardStepNum===2){
+    wizardSetBody(`
+      <label class="first">${t('wAtcdPsyIndiv')}</label>
+      ${singleRowHTMLi18n('uAtcdPsyIPres', OUI_NON_KEYS, urg.atcd.psyIndivPresence, k=>Lmisc('ouiNon',k))}
+      <div id="uAtcdPsyIDetail" style="display:${urg.atcd.psyIndivPresence==='yes'?'block':'none'};margin-top:10px;">
+        ${multiRowHTMLi18n('uAtcdPsyIChips', ATCD_PSY_INDIV_KEYS, urg.atcd.psyIndivChips, k=>Lmisc('atcdPsyIndiv',k))}
+        <textarea id="uAtcdPsyI" placeholder="${t('wPrecisions')}">${urg.atcd.psyIndiv}</textarea>
+      </div>
+
+      <label>${t('wAtcdPsyFam')}</label>
+      ${singleRowHTMLi18n('uAtcdPsyFPres', OUI_NON_KEYS, urg.atcd.psyFamPresence, k=>Lmisc('ouiNon',k))}
+      <div id="uAtcdPsyFDetail" style="display:${urg.atcd.psyFamPresence==='yes'?'block':'none'};margin-top:10px;">
+        <p class="hint">${t('wLien')}</p>
+        ${multiRowHTMLi18n('uAtcdPsyFLien', LIEN_PARENTE_KEYS, urg.atcd.psyFamLien, k=>Lmisc('lienParente',k))}
+        <p class="hint" style="margin-top:12px;">${t('wType')}</p>
+        ${multiRowHTMLi18n('uAtcdPsyFChips', ATCD_PSY_FAM_KEYS, urg.atcd.psyFamChips, k=>Lmisc('atcdPsyFam',k))}
+        <textarea id="uAtcdPsyF" placeholder="${t('wPrecisions')}">${urg.atcd.psyFam}</textarea>
+      </div>
+
+      <label>${t('wAtcdSomIndiv')}</label>
+      ${singleRowHTMLi18n('uAtcdSomIPres', OUI_NON_KEYS, urg.atcd.somIndivPresence, k=>Lmisc('ouiNon',k))}
+      <div id="uAtcdSomIDetail" style="display:${urg.atcd.somIndivPresence==='yes'?'block':'none'};margin-top:10px;">
+        ${multiRowHTMLi18n('uAtcdSomIChips', ATCD_SOM_KEYS, urg.atcd.somIndivChips, k=>Lmisc('atcdSom',k))}
+        <textarea id="uAtcdSomI" placeholder="${t('wPrecisions')}">${urg.atcd.somIndiv}</textarea>
+      </div>
+
+      <label>${t('wAtcdSomFam')}</label>
+      ${singleRowHTMLi18n('uAtcdSomFPres', OUI_NON_KEYS, urg.atcd.somFamPresence, k=>Lmisc('ouiNon',k))}
+      <div id="uAtcdSomFDetail" style="display:${urg.atcd.somFamPresence==='yes'?'block':'none'};margin-top:10px;">
+        <p class="hint">${t('wLien')}</p>
+        ${multiRowHTMLi18n('uAtcdSomFLien', LIEN_PARENTE_KEYS, urg.atcd.somFamLien, k=>Lmisc('lienParente',k))}
+        <p class="hint" style="margin-top:12px;">${t('wType')}</p>
+        ${multiRowHTMLi18n('uAtcdSomFChips', ATCD_SOM_KEYS, urg.atcd.somFamChips, k=>Lmisc('atcdSom',k))}
+        <textarea id="uAtcdSomF" placeholder="${t('wPrecisions')}">${urg.atcd.somFam}</textarea>
+      </div>
+
+      <label class="first">${t('wModeDebut')}</label>
+      ${singleRowHTMLi18n('uHistoireDebut', MODE_DEBUT_KEYS, urg.histoireDebut, k=>Lmisc('modeDebut',k))}
+      <label>${t('wDeclencheurs')}</label>
+      ${multiRowHTMLi18n('uHistoireDeclencheurs', DECLENCHEURS_KEYS, urg.histoireDeclencheurs, k=>Lmisc('declencheurs',k))}
+      <label>${t('wEvolution')}</label>
+      <textarea id="uHistoire" placeholder="Évolution depuis le début des symptômes">${urg.histoire}</textarea>
+    `);
+    bindSingleRow('uAtcdPsyIPres', v=>{ document.getElementById('uAtcdPsyIDetail').style.display = v==='yes'?'block':'none'; });
+    bindSingleRow('uAtcdPsyFPres', v=>{ document.getElementById('uAtcdPsyFDetail').style.display = v==='yes'?'block':'none'; });
+    bindSingleRow('uAtcdSomIPres', v=>{ document.getElementById('uAtcdSomIDetail').style.display = v==='yes'?'block':'none'; });
+    bindSingleRow('uAtcdSomFPres', v=>{ document.getElementById('uAtcdSomFDetail').style.display = v==='yes'?'block':'none'; });
+    ['uAtcdPsyIChips','uAtcdPsyFLien','uAtcdPsyFChips','uAtcdSomIChips','uAtcdSomFLien','uAtcdSomFChips'].forEach(id=>bindMultiRow(id));
+    bindSingleRow('uHistoireDebut'); bindMultiRow('uHistoireDeclencheurs');
+  }
+  else if(wizardStepNum===3){
+    wizardSetBody(`
+      <div class="section-title first">${t('wExamenMental')}</div>
+      ${MSE_DOMAINS.map(dm=>`
+        <label>${L('mse',dm.key,'label')}</label>
+        <div class="choice-row" data-mse="${dm.key}">
+          ${MSE_OPTION_KEYS[dm.key].map(ok=>`<div class="choice${urg.mse[dm.key]===ok?' selected':''}" data-value="${ok}">${L('mse',dm.key).options[ok]}</div>`).join('')}
+        </div>
+      `).join('')}
+      <div class="section-title">${t('wExamenPhysique')}</div>
+      <p class="hint">${t('wConstantes')}</p>
+      <div class="vital-grid">
+        <div><label class="first">TA (mmHg)</label><input type="text" id="uVta" value="${urg.vitals.ta}"></div>
+        <div><label class="first">FC (/min)</label><input type="text" id="uVfc" value="${urg.vitals.fc}"></div>
+        <div><label>FR (/min)</label><input type="text" id="uVfr" value="${urg.vitals.fr}"></div>
+        <div><label>Température (°C)</label><input type="text" id="uVtemp" value="${urg.vitals.temp}"></div>
+        <div><label>SpO2 (%)</label><input type="text" id="uVspo2" value="${urg.vitals.spo2}"></div>
+        <div><label>Glycémie capillaire</label><input type="text" id="uVglyc" value="${urg.vitals.glyc}"></div>
+      </div>
+      <p class="hint" style="margin-top:16px;">${t('wTechnique')}</p>
+      ${PHYSIO_SYSTEMS.map(s=>`
+        <div class="physio-row">
+          <div class="physio-head"><strong>${L('physio',s.key)}</strong></div>
+          <div class="choice-row" data-physio="${s.key}">
+            <div class="choice${urg.physio[s.key]?.status==='Normal'?' selected':''}" data-value="Normal">${L('physio','normal')}</div>
+            <div class="choice${urg.physio[s.key]?.status==='Anomalie'?' risk-selected':''}" data-value="Anomalie" data-risk="true">${L('physio','anomalie')}</div>
+          </div>
+          <textarea id="uPhysio-${s.key}" placeholder="${t('wPrecisionsAnomalie')}" style="margin-top:8px;">${urg.physio[s.key]?.notes||''}</textarea>
+        </div>
+      `).join('')}
+    `);
+    document.querySelectorAll('#wizardBody .choice-row[data-mse]').forEach(row=>{
+      row.querySelectorAll('.choice').forEach(ch=>{
+        ch.addEventListener('click', ()=>{
+          row.querySelectorAll('.choice').forEach(c=>c.classList.remove('selected'));
+          ch.classList.add('selected');
+          urg.mse[row.dataset.mse] = ch.dataset.value;
+        });
+      });
+    });
+    document.querySelectorAll('#wizardBody .choice-row[data-physio]').forEach(row=>{
+      row.querySelectorAll('.choice').forEach(ch=>{
+        ch.addEventListener('click', ()=>{
+          row.querySelectorAll('.choice').forEach(c=>c.classList.remove('selected','risk-selected'));
+          ch.classList.add(ch.dataset.risk==='true' ? 'risk-selected' : 'selected');
+          const key = row.dataset.physio;
+          urg.physio[key] = urg.physio[key] || {};
+          urg.physio[key].status = ch.dataset.value;
+        });
+      });
+    });
+  }
+  else if(wizardStepNum===4){
+    wizardSetBody(`
+      <p class="hint">${t('wTroubleHint')}</p>
+      ${SIGN_CATEGORY_DEFS.map(cat=>`
+        <div class="section-title first">${L('signCategoryTitles',cat.key)}</div>
+        <div class="card">
+          ${cat.items.map(item=>`
+            <label class="check-item"><input type="checkbox" data-sign="${item}" ${urgenceSigns.has(item)?'checked':''} onchange="updateUrgenceMatchUI()"><span>${L('signs',item)}</span></label>
+          `).join('')}
+        </div>
+      `).join('')}
+      <div class="verdict v-unclear" id="urgenceVerdict" style="margin-top:4px;">Cochez au moins un signe pour obtenir une orientation.</div>
+    `);
+    document.querySelectorAll('#wizardBody input[data-sign]').forEach(cb=>{
+      cb.addEventListener('change', ()=>{
+        if(cb.checked) urgenceSigns.add(cb.dataset.sign); else urgenceSigns.delete(cb.dataset.sign);
+        updateUrgenceMatchUI();
+      });
+    });
+    updateUrgenceMatchUI();
+  }
+  else if(wizardStepNum===5){
+    const motifColor = window.lastMotifColor || 'jaune';
+    const troubleColor = window.lastUrgenceColor || 'jaune';
+    const finalColor = worstColor([motifColor, troubleColor]);
+    const actionRed = L('urgence', currentUrgence, 'actionRed');
+    const actionOrange = L('urgence', currentUrgence, 'actionOrange');
+    const firstLineText = currentLang==='ar' ? "تدبير أولي من قبل الطبيب المعالج، مع طلب استشارة نفسية في حال عدم التحسن."
+      : (currentLang==='en' ? "First-line management by the attending physician, with a psychiatric opinion requested if there is no improvement."
+      : "Prise en charge de première ligne par le médecin traitant, avec demande d'avis en psychiatrie si absence d'amélioration.");
+    const troubleText = finalColor==='rouge' ? actionRed : (finalColor==='orange' ? (actionOrange||actionRed) : firstLineText);
+    const parts = [];
+    if(motifColor===finalColor && window.lastMotifText) parts.push(window.lastMotifText);
+    if(troubleColor===finalColor) parts.push(troubleText);
+    const detailAction = parts.length ? parts.join(' ') : troubleText;
+    const headline = (motifColor===finalColor && window.lastMotifText) ? window.lastMotifText : COLOR_LABEL[finalColor];
+    wizardSetBody(`
+      <div class="verdict ${finalColor==='rouge'?'v-organic':finalColor==='orange'?'v-orange':'v-functional'}" style="font-size:17.5px;">
+        ${headline}
+      </div>
+      <div class="card" style="margin-top:14px;">
+        <strong style="font-size:15px;color:var(--muted);">${t('wDetailRetenu')}</strong>
+        <p style="margin:8px 0 0;font-size:16px;">${detailAction}</p>
+      </div>
+      <label class="first">${t('wRappels')}</label>
+      <div class="card">
+        <div class="check-item"><input type="checkbox" disabled checked><span>${t('r1')}</span></div>
+        <div class="check-item"><input type="checkbox" disabled checked><span>${t('r2')}</span></div>
+        <div class="check-item"><input type="checkbox" disabled checked><span>${t('r3')}</span></div>
+        <div class="check-item"><input type="checkbox" disabled checked><span>${t('r4')}</span></div>
+      </div>
+      <label>${t('wNotesComplementaires')}</label>
+      <textarea id="uConduite" placeholder="Observations, éléments contextuels non couverts ci-dessus">${urg.conduite}</textarea>
+    `);
+  }
+}
+
+function saveWizardStepData(){
+  if(wizardStepNum===1){
+    urg.civil.age = document.getElementById('uCivilAge')?.value||'';
+    urg.civil.sexe = readSingleRow('uCivilSexe');
+    urg.civil.profession = document.getElementById('uCivilProf')?.value||'';
+    urg.civil.situation = readSingleRow('uCivilSituation');
+    urg.motifChips = readMultiRow('uMotifChips');
+    urg.motif = document.getElementById('uMotif')?.value||'';
+  } else if(wizardStepNum===2){
+    urg.atcd.psyIndivPresence = readSingleRow('uAtcdPsyIPres');
+    urg.atcd.psyIndivChips = readMultiRow('uAtcdPsyIChips');
+    urg.atcd.psyIndiv = document.getElementById('uAtcdPsyI')?.value||'';
+    urg.atcd.psyFamPresence = readSingleRow('uAtcdPsyFPres');
+    urg.atcd.psyFamLien = readMultiRow('uAtcdPsyFLien');
+    urg.atcd.psyFamChips = readMultiRow('uAtcdPsyFChips');
+    urg.atcd.psyFam = document.getElementById('uAtcdPsyF')?.value||'';
+    urg.atcd.somIndivPresence = readSingleRow('uAtcdSomIPres');
+    urg.atcd.somIndivChips = readMultiRow('uAtcdSomIChips');
+    urg.atcd.somIndiv = document.getElementById('uAtcdSomI')?.value||'';
+    urg.atcd.somFamPresence = readSingleRow('uAtcdSomFPres');
+    urg.atcd.somFamLien = readMultiRow('uAtcdSomFLien');
+    urg.atcd.somFamChips = readMultiRow('uAtcdSomFChips');
+    urg.atcd.somFam = document.getElementById('uAtcdSomF')?.value||'';
+    urg.histoireDebut = readSingleRow('uHistoireDebut');
+    urg.histoireDeclencheurs = readMultiRow('uHistoireDeclencheurs');
+    urg.histoire = document.getElementById('uHistoire')?.value||'';
+  } else if(wizardStepNum===3){
+    urg.vitals.ta = document.getElementById('uVta')?.value||'';
+    urg.vitals.fc = document.getElementById('uVfc')?.value||'';
+    urg.vitals.fr = document.getElementById('uVfr')?.value||'';
+    urg.vitals.temp = document.getElementById('uVtemp')?.value||'';
+    urg.vitals.spo2 = document.getElementById('uVspo2')?.value||'';
+    urg.vitals.glyc = document.getElementById('uVglyc')?.value||'';
+    PHYSIO_SYSTEMS.forEach(s=>{
+      const ta = document.getElementById('uPhysio-'+s.key);
+      if(ta){ urg.physio[s.key] = urg.physio[s.key]||{}; urg.physio[s.key].notes = ta.value; }
+    });
+  } else if(wizardStepNum===4){
+    window.lastUrgenceVerdict = document.getElementById('urgenceVerdict')?.textContent || '';
+  } else if(wizardStepNum===5){
+    urg.conduite = document.getElementById('uConduite')?.value||'';
+  }
+}
+
+function wizardMove(dir){
+  saveWizardStepData();
+  if(wizardStepNum===1 && dir===-1){ goTo('home'); return; }
+  if(wizardStepNum===WIZARD_TOTAL && dir===1){ renderSummary(); goTo('summary'); return; }
+  wizardStepNum = Math.min(WIZARD_TOTAL, Math.max(1, wizardStepNum+dir));
+  renderWizardStep();
+}
+
+
+function updateUrgenceMatchUI(){
+  const ranked = computeUrgenceMatch(urgenceSigns);
+  const v = document.getElementById('urgenceVerdict');
+  if(!v) return;
+  v.className = 'verdict';
+  if(ranked.length===0){
+    v.classList.add('v-unclear');
+    v.textContent = "Cochez au moins un signe pour obtenir une orientation.";
+    window.lastUrgenceColor = 'jaune';
+    return;
+  }
+  const topScore = ranked[0][1].score;
+  const topMatches = ranked.filter(([,v2])=>v2.score===topScore);
+  currentUrgence = topMatches[0][0];
+  const anyRed = topMatches.some(([,v2])=>v2.hasRed);
+  const color = anyRed ? 'rouge' : 'orange';
+  window.lastUrgenceColor = color;
+  const labels = topMatches.map(([k])=>L('urgence',k,'label')).join(' / ');
+  const action = anyRed ? L('urgence',currentUrgence,'actionRed') : (L('urgence',currentUrgence,'actionOrange') || L('urgence',currentUrgence,'actionRed'));
+  v.classList.add(anyRed ? 'v-organic' : 'v-orange');
+  const diagWord = currentLang==='ar' ? 'التشخيص الأرجح' : (currentLang==='en' ? 'Most likely diagnosis' : 'Diagnostic le plus probable');
+  v.textContent = `${anyRed?'🔴':'🟠'} ${diagWord} : ${labels}. ${action}`;
+  window.lastUrgenceVerdict = v.textContent;
+}
+
+// ---- somatic anxiety module ----
+const SOMA_I18N = {
+  fr: {
+    colon: { label:"Côlon irritable",
+      redFlags:["Perte de poids inexpliquée","Rectorragies","Anémie","Première apparition après 50 ans","Antécédents familiaux MICI ou cancer colorectal","Réveil nocturne par les symptômes","Fièvre associée"],
+      functional:["Douleur soulagée par la défécation","Alternance diarrhée / constipation","Symptômes évoluant depuis plus de 6 mois","Corrélation nette avec stress ou anxiété","Examen clinique et biologie de base normaux"],
+      referral:"Orientation psy si anxiété généralisée invalidante associée ; sinon prise en charge fonctionnelle en 1ère ligne." },
+    palpitations: { label:"Palpitations",
+      redFlags:["Syncope associée","Douleur thoracique","Dyspnée d'effort","Antécédents cardiaques connus","Palpitations régulières et brutales (évoquant arythmie)","Anomalie à l'ECG"],
+      functional:["Survenue en contexte de stress ou d'anxiété","Début progressif","Symptômes anxieux associés (paresthésies, oppression, peur de mourir)","ECG normal"],
+      referral:"Orientation psy si critères de trouble panique ; sinon Holter et bilan thyroïdien d'abord." },
+    dermato: { label:"Dermatose",
+      redFlags:["Pas encore de confirmation dermatologique du diagnostic","Lésion d'aspect atypique ou évolutif inhabituel","Signes d'infection ou de surinfection"],
+      functional:["Lésions dans des zones facilement accessibles aux mains","Morphologie géométrique ou artificielle","Antécédent de trouble obsessionnel ou dépressif","Doute sur une manipulation des lésions (dermatillomanie, dermatite factice)"],
+      referral:"Le dermatologue reste systématique. Orientation psy en complément, jamais à sa place — l'anxiété aggrave une dermatose organique, elle ne la remplace pas." },
+    anxiete: { label:"Anxiété générale",
+      redFlags:["Signes d'hyperthyroïdie","Hypoglycémie documentée","Cause médicamenteuse ou toxique identifiée","Symptôme neurologique focal associé"],
+      functional:["Symptômes multiples et changeants","Contexte de stress identifiable","Bilan biologique et paraclinique normal","Échec d'une prise en charge de 1ère ligne (réassurance, hygiène de vie)"],
+      referral:"Référer si anxiété invalidante, échec de la 1ère ligne, ou doute diagnostique persistant." },
+    cephalees: { label:"Céphalées de tension",
+      redFlags:["Début brutal en coup de tonnerre","Céphalée inhabituelle après 50 ans sans antécédent","Signes neurologiques associés (déficit, trouble visuel)","Fièvre associée","Aggravation progressive sur plusieurs semaines","Réveil nocturne par la douleur"],
+      functional:["Douleur en casque ou en bandeau, bilatérale","Absence de nausées/vomissements marqués","Nettement aggravée par le stress","Examen neurologique normal"],
+      referral:"Orientation psy si anxiété chronique invalidante associée ; sinon prise en charge antalgique et hygiène de vie en 1ère ligne." },
+    vertiges: { label:"Vertiges psychogènes",
+      redFlags:["Vertige rotatoire brutal avec nystagmus","Signes neurologiques focaux associés","Perte auditive brutale associée","Céphalée brutale associée","Trouble sévère de l'équilibre à la marche"],
+      functional:["Sensation d'instabilité plutôt que rotation vraie","Aggravé en situation anxiogène ou sociale","Examen neurologique et ORL normaux","Autres symptômes anxieux associés"],
+      referral:"Orientation psy si trouble anxieux caractérisé ; sinon avis ORL/neurologique en 1ère ligne pour éliminer une cause vestibulaire ou centrale." },
+    fatigue: { label:"Fatigue chronique inexpliquée",
+      redFlags:["Perte de poids associée","Fièvre ou sueurs nocturnes","Adénopathies","Anémie ou anomalie biologique","Apnées du sommeil non explorées"],
+      functional:["Fatigue fluctuant avec le contexte émotionnel","Sommeil non réparateur sans cause organique identifiée","Bilan biologique de base normal","Contexte de stress chronique, anxiété ou symptômes dépressifs"],
+      referral:"Orientation psy si symptomatologie dépressive/anxieuse associée ; sinon bilan somatique de 1ère intention (NFS, TSH, ferritine)." }
+  },
+  en: {
+    colon: { label:"Irritable bowel syndrome",
+      redFlags:["Unexplained weight loss","Rectal bleeding","Anemia","First onset after age 50","Family history of IBD or colorectal cancer","Nocturnal awakening due to symptoms","Associated fever"],
+      functional:["Pain relieved by defecation","Alternating diarrhea/constipation","Symptoms present for over 6 months","Clear correlation with stress or anxiety","Normal clinical exam and baseline labs"],
+      referral:"Refer to psychiatry if disabling generalized anxiety is associated; otherwise first-line functional management." },
+    palpitations: { label:"Palpitations",
+      redFlags:["Associated syncope","Chest pain","Exertional dyspnea","Known cardiac history","Regular and abrupt palpitations (suggesting arrhythmia)","ECG abnormality"],
+      functional:["Occurs in a context of stress or anxiety","Gradual onset","Associated anxiety symptoms (paresthesia, tightness, fear of dying)","Normal ECG"],
+      referral:"Refer to psychiatry if panic disorder criteria are met; otherwise Holter monitoring and thyroid work-up first." },
+    dermato: { label:"Skin condition (dermatosis)",
+      redFlags:["No dermatological confirmation of diagnosis yet","Atypical appearance or unusual evolution","Signs of infection or superinfection"],
+      functional:["Lesions in areas easily reached by hands","Geometric or artificial-looking morphology","History of obsessive or depressive disorder","Suspicion of lesion manipulation (dermatillomania, factitious dermatitis)"],
+      referral:"Dermatology referral remains systematic. Psychiatric input is complementary, never a replacement — anxiety worsens an organic dermatosis, it does not cause it." },
+    anxiete: { label:"Generalized anxiety",
+      redFlags:["Signs of hyperthyroidism","Documented hypoglycemia","Identified drug or toxic cause","Associated focal neurological symptom"],
+      functional:["Multiple and changing symptoms","Identifiable stress context","Normal biological and paraclinical work-up","Failure of first-line management (reassurance, lifestyle measures)"],
+      referral:"Refer if disabling anxiety, failure of first-line treatment, or persistent diagnostic doubt." },
+    cephalees: { label:"Tension headache",
+      redFlags:["Sudden thunderclap onset","Unusual headache after age 50 with no history","Associated neurological signs (deficit, visual disturbance)","Associated fever","Progressive worsening over several weeks","Nocturnal awakening due to pain"],
+      functional:["Bilateral band-like or helmet-like pain","No marked nausea/vomiting","Clearly worsened by stress","Normal neurological exam"],
+      referral:"Refer to psychiatry if disabling chronic anxiety is associated; otherwise first-line analgesia and lifestyle measures." },
+    vertiges: { label:"Psychogenic vertigo",
+      redFlags:["Sudden rotational vertigo with nystagmus","Associated focal neurological signs","Associated sudden hearing loss","Associated sudden headache","Severe gait imbalance"],
+      functional:["Sensation of unsteadiness rather than true rotation","Worsened in anxiety-provoking or social situations","Normal neurological and ENT exam","Other associated anxiety symptoms"],
+      referral:"Refer to psychiatry if a defined anxiety disorder is present; otherwise ENT/neurology opinion first to rule out a vestibular or central cause." },
+    fatigue: { label:"Chronic unexplained fatigue",
+      redFlags:["Associated weight loss","Fever or night sweats","Lymphadenopathy","Anemia or biological abnormality","Unexplored sleep apnea"],
+      functional:["Fatigue fluctuating with emotional context","Non-restorative sleep with no organic cause identified","Normal baseline labs","Context of chronic stress, anxiety, or depressive symptoms"],
+      referral:"Refer to psychiatry if depressive/anxious symptoms are associated; otherwise first-line somatic work-up (CBC, TSH, ferritin)." }
+  },
+  ar: {
+    colon: { label:"متلازمة القولون العصبي",
+      redFlags:["فقدان وزن غير مفسَّر","نزيف مستقيمي","فقر دم","ظهور أول للأعراض بعد سن الخمسين","سوابق عائلية لمرض التهاب الأمعاء أو سرطان القولون","استيقاظ ليلي بسبب الأعراض","حمى مرافقة"],
+      functional:["ألم يخف بعد التبرز","تناوب بين الإسهال والإمساك","أعراض مستمرة منذ أكثر من 6 أشهر","ارتباط واضح بالتوتر أو القلق","فحص سريري وتحاليل أساسية طبيعية"],
+      referral:"التوجيه للطب النفسي في حال وجود قلق عام معيق مرافق؛ وإلا فتدبير وظيفي كخط أول." },
+    palpitations: { label:"خفقان القلب",
+      redFlags:["إغماء مرافق","ألم صدري","ضيق نفس عند الجهد","سوابق قلبية معروفة","خفقان منتظم ومفاجئ (يوحي باضطراب نظم)","شذوذ في تخطيط القلب"],
+      functional:["يحدث في سياق توتر أو قلق","بداية تدريجية","أعراض قلق مرافقة (تنميل، ضيق، خوف من الموت)","تخطيط قلب طبيعي"],
+      referral:"التوجيه للطب النفسي عند توفر معايير اضطراب الهلع؛ وإلا فتخطيط قلب مطول (هولتر) وتقييم درقي أولاً." },
+    dermato: { label:"حالة جلدية",
+      redFlags:["لم يتم بعد تأكيد التشخيص الجلدي","مظهر غير نمطي أو تطور غير معتاد","علامات عدوى أو عدوى ثانوية"],
+      functional:["آفات في مناطق يسهل الوصول إليها باليد","شكل هندسي أو مفتعل","سوابق اضطراب وسواسي أو اكتئابي","شك في التلاعب بالآفات (نتف الجلد القهري، التهاب جلد مفتعل)"],
+      referral:"استشارة الجلدية تبقى ضرورية دائماً. الدعم النفسي مكمّل، لا يحل محله أبداً — القلق يفاقم حالة جلدية عضوية، لا يسببها." },
+    anxiete: { label:"القلق العام",
+      redFlags:["علامات فرط نشاط الدرقية","نقص سكر دم موثق","سبب دوائي أو سمّي محدد","عرض عصبي بؤري مرافق"],
+      functional:["أعراض متعددة ومتغيرة","سياق توتر يمكن تحديده","تقييم بيولوجي وشبه سريري طبيعي","فشل التدبير كخط أول (الطمأنة، تعديل نمط الحياة)"],
+      referral:"التوجيه في حال قلق معيق، فشل الخط الأول، أو شك تشخيصي مستمر." },
+    cephalees: { label:"الصداع التوتري",
+      redFlags:["بداية مفاجئة كالصاعقة","صداع غير معتاد بعد سن الخمسين دون سوابق","علامات عصبية مرافقة (عجز، اضطراب بصري)","حمى مرافقة","تفاقم تدريجي على مدى أسابيع","استيقاظ ليلي بسبب الألم"],
+      functional:["ألم على شكل حزام أو خوذة، ثنائي الجانب","غياب غثيان/تقيؤ ملحوظ","يتفاقم بوضوح مع التوتر","فحص عصبي طبيعي"],
+      referral:"التوجيه للطب النفسي في حال قلق مزمن معيق مرافق؛ وإلا فتسكين الألم وتعديل نمط الحياة كخط أول." },
+    vertiges: { label:"الدوار النفسي المنشأ",
+      redFlags:["دوار دوراني مفاجئ مع رأرأة","علامات عصبية بؤرية مرافقة","فقدان سمع مفاجئ مرافق","صداع مفاجئ مرافق","اضطراب شديد في توازن المشي"],
+      functional:["إحساس بعدم الثبات أكثر من دوران حقيقي","يتفاقم في المواقف المثيرة للقلق أو الاجتماعية","فحص عصبي وأنفي أذني طبيعي","أعراض قلق أخرى مرافقة"],
+      referral:"التوجيه للطب النفسي عند وجود اضطراب قلق محدد؛ وإلا فاستشارة أنف أذن حنجرة/عصبية أولاً لاستبعاد سبب دهليزي أو مركزي." },
+    fatigue: { label:"التعب المزمن غير المفسَّر",
+      redFlags:["فقدان وزن مرافق","حمى أو تعرق ليلي","تضخم عقد لمفاوية","فقر دم أو شذوذ بيولوجي","انقطاع نفس نومي غير مستكشف"],
+      functional:["تعب يتقلب مع السياق الانفعالي","نوم غير مريح دون سبب عضوي محدد","تحاليل أساسية طبيعية","سياق توتر مزمن، قلق، أو أعراض اكتئابية"],
+      referral:"التوجيه للطب النفسي في حال أعراض اكتئابية/قلقية مرافقة؛ وإلا فتقييم جسدي أولي (تعداد دم كامل، هرمون الدرقية، الفيريتين)." }
+  }
+};
+function SD(key, field){ return (SOMA_I18N[currentLang] || SOMA_I18N.fr)[key][field]; }
+
+let currentSoma = 'colon';
+
+function renderSoma(){
+  const rf = document.getElementById('somaRedFlags');
+  const fn = document.getElementById('somaFunctional');
+  rf.innerHTML = SD(currentSoma,'redFlags').map((t,i)=>`
+    <label class="check-item redflag"><input type="checkbox" data-kind="rf" data-idx="${i}" onchange="updateSomaVerdict()"><span>${t}</span></label>
+  `).join('');
+  fn.innerHTML = SD(currentSoma,'functional').map((t,i)=>`
+    <label class="check-item"><input type="checkbox" data-kind="fn" data-idx="${i}" onchange="updateSomaVerdict()"><span>${t}</span></label>
+  `).join('');
+  updateSomaVerdict();
+}
+
+function updateSomaVerdict(){
+  const referral = SD(currentSoma,'referral');
+  const rfChecked = document.querySelectorAll('#somaRedFlags input:checked').length;
+  const fnChecked = document.querySelectorAll('#somaFunctional input:checked').length;
+  const v = document.getElementById('somaVerdict');
+  v.className = 'verdict';
+  const wordsFlag = currentLang==='ar' ? {n:'علامة/علامات تحذيرية', msg1:(n)=>`تم تحديد ${n} علامة/علامات تحذيرية — يجب إجراء تقييم عضوي أولاً قبل أي توجه نفسي المنشأ. ${referral}`, msg2:(n)=>`لا توجد علامات تحذيرية، ${n} معيار/معايير وظيفية متوفرة. التوجه الوظيفي/النفسي المنشأ محتمل. ${referral}`, msg3:"العناصر غير كافية للاستنتاج. متابعة التقييم قبل التوجيه."}
+    : (currentLang==='en' ? {msg1:(n)=>`${n} red flag(s) checked — organic work-up takes priority before any psychogenic orientation. ${referral}`, msg2:(n)=>`No red flags, ${n} functional criterion/criteria present. A functional/psychogenic orientation is plausible. ${referral}`, msg3:"Not enough elements to conclude. Continue the assessment before referral."}
+    : {msg1:(n)=>`${n} drapeau(x) rouge(s) coché(s) — bilan organique prioritaire avant toute orientation psychogène. ${referral}`, msg2:(n)=>`Aucun drapeau rouge, ${n} critère(s) fonctionnel(s) présents. Orientation fonctionnelle/psychogène plausible. ${referral}`, msg3:"Éléments insuffisants pour conclure. Poursuivre l'évaluation avant orientation."});
+  if(rfChecked > 0){
+    v.classList.add('v-organic');
+    v.textContent = wordsFlag.msg1(rfChecked);
+  } else if(fnChecked >= 2){
+    v.classList.add('v-functional');
+    v.textContent = wordsFlag.msg2(fnChecked);
+  } else {
+    v.classList.add('v-unclear');
+    v.textContent = wordsFlag.msg3;
+  }
+}
+
+document.querySelectorAll('#somaSubtypes .subtype').forEach(el=>{
+  el.addEventListener('click', ()=>{
+    document.querySelectorAll('#somaSubtypes .subtype').forEach(s=>s.classList.remove('selected'));
+    el.classList.add('selected');
+    currentSoma = el.dataset.subtype;
+    document.getElementById('somaRedFlagTitle').textContent =
+      currentSoma==='dermato' ? t('somaRedFlagTitleDermato') : t('somaRedFlagTitle');
+    renderSoma();
+  });
+});
+renderSoma();
+
+// ---- export / import (no local storage — data stays in-memory only) ----
+function collectData(){
+  const data = {ref: val('patientRef'), fields:{}, choices:{}};
+  document.querySelectorAll('textarea, input[type=text]').forEach(el=>{ if(el.id) data.fields[el.id]=el.value; });
+  document.querySelectorAll('.choice-row').forEach(row=>{
+    const active = row.querySelector('.choice[data-active="true"]');
+    data.choices[row.dataset.group] = active ? active.dataset.value : null;
+  });
+  return data;
+}
+
+function exportJSON(){
+  const data = collectData();
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = (data.ref!=='—' && data.ref ? data.ref : 'seance') + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importJSON(evt){
+  const file = evt.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    try{
+      const data = JSON.parse(e.target.result);
+      document.getElementById('patientRef').value = data.ref || '';
+      Object.entries(data.fields||{}).forEach(([id,v])=>{ const el=document.getElementById(id); if(el) el.value=v; });
+      Object.entries(data.choices||{}).forEach(([group,value])=>{
+        document.querySelectorAll(`.choice-row[data-group="${group}"] .choice`).forEach(c=>{
+          const match = c.dataset.value===value;
+          c.dataset.active = match ? "true":"false";
+          c.classList.toggle('selected', match && c.dataset.risk!=='true');
+          c.classList.toggle('risk-selected', match && c.dataset.risk==='true');
+        });
+      });
+      updateRiskBanner();
+      renderSummary();
+      goTo('summary');
+    }catch(err){ alert("Fichier invalide."); }
+  };
+  reader.readAsText(file);
+}
+
+applyStaticTranslations();
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{ /* offline mode unavailable, app still works online */ });
+  });
+}
+</script>
+</body>
+</html>
