@@ -1,7 +1,7 @@
 // Psychiatry Toolkit — service worker
 // Caches the app shell so the toolkit keeps working with no connection.
 // Bump CACHE_NAME whenever index.html changes so the new version is fetched.
-const CACHE_NAME = "psy-toolkit-v2";
+const CACHE_NAME = "psy-toolkit-v3";
 const ASSETS = [
   "./",
   "./index.html",
