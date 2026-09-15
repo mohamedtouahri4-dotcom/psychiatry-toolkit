@@ -27,10 +27,6 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-// Cache-first for the app shell, falling back to network, so the app
-// still opens with no connection. Google Fonts requests are left to
-// the network (they fail silently offline; the app still works with
-// system fonts as a fallback).
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
   const url = new URL(event.request.url);
