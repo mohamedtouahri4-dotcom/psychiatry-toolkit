@@ -1,0 +1,401 @@
+﻿‎<!DOCTYPE html>
+‎<html lang="fr">
+‎<head>
+‎<meta charset="UTF-8">
+‎<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+‎<title>Psychiatry Toolkit</title>
+‎<meta name="author" content="Dr TOUAHRI Mohammed">
+‎<meta name="contact" content="mohammedtouahri42@gmail.com, +213 777 122 805">
+‎<link rel="manifest" href="manifest.json">
+‎<meta name="theme-color" content="#0284c7">
+‎<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+‎<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+‎<meta name="apple-mobile-web-app-capable" content="yes">
+‎<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+‎<meta name="apple-mobile-web-app-title" content="PsyToolkit">
+‎<link rel="preconnect" href="https://fonts.googleapis.com">
+‎<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
+‎<style>
+‎  :root{
+‎    /* Nouveau thème médicalisé (Bleu élégant et Gris doux) */
+‎    --ink: #1e293b; 
+‎    --bg: #f8fafc;
+‎    --panel: #ffffff;
+‎    --line: #e2e8f0;
+‎    --accent: #0284c7; 
+‎    --accent-dark: #0369a1;
+‎    --accent-light: #7dd3fc;
+‎    --risk: #dc2626;
+‎    --risk-bg: #fef2f2;
+‎    --muted: #64748b;
+‎    --gold: #d97706;
+‎  }
+‎  *{box-sizing:border-box;}
+‎  html,body{margin:0;padding:0;}
+‎  body{
+‎    background:var(--bg);
+‎    color:var(--ink);
+‎    font-family:'IBM Plex Sans',sans-serif;
+‎    -webkit-tap-highlight-color:transparent;
+‎    min-height:100vh;
+‎    display:flex;
+‎    flex-direction:column;
+‎  }
+‎  h1,h2,h3{font-family:'IBM Plex Serif',serif;font-weight:600;margin:0;}
+‎  #app{flex:1;padding:20px 18px 90px;max-width:640px;margin:0 auto;width:100%;}
+‎  .topbar{
+‎    max-width:640px;margin:0 auto;width:100%;
+‎    padding:16px 18px 14px;
+‎    display:flex;align-items:center;gap:10px;justify-content:space-between;
+‎    border-bottom:1px solid var(--line);
+‎    background:var(--panel);
+‎    box-shadow:0 1px 0 rgba(15,23,42,0.03);
+‎    position:relative;z-index:2;
+‎  }
+‎  .brand{display:flex;align-items:center;gap:10px;}
+‎  .brand-mark{
+‎    width:34px;height:34px;border-radius:9px;
+‎    background:linear-gradient(160deg,var(--accent-light),var(--accent-dark));
+‎    display:flex;align-items:center;justify-content:center;
+‎    color:white;font-family:'IBM Plex Serif',serif;font-weight:600;font-size:15px;
+‎    box-shadow:0 2px 5px rgba(2,132,199,0.25);
+‎    flex-shrink:0;
+‎  }
+‎  .topbar h1{font-size:21px;letter-spacing:-0.2px;}
+‎  .topbar span{font-size:14px;color:var(--muted);}
+‎  .screen{display:none;}
+‎  .screen.active{display:block;animation:fade .25s ease;}
+‎  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+‎
+‎  .card{
+‎    background:var(--panel);
+‎    border:1px solid var(--line);
+‎    border-radius:14px;
+‎    padding:16px 16px;
+‎    margin-bottom:12px;
+‎    box-shadow:0 1px 2px rgba(15,23,42,0.03), 0 3px 10px rgba(15,23,42,0.04);
+‎  }
+‎  .module-list .card{
+‎    display:flex;align-items:center;justify-content:space-between;
+‎    cursor:pointer;
+‎    border-left:3px solid var(--accent-light);
+‎    transition:transform .12s ease, box-shadow .12s ease;
+‎  }
+‎  .module-list .card:active{background:#f1f5f9;transform:scale(0.99);}
+‎  .module-list h3{font-size:19px;}
+‎  .module-list p{margin:4px 0 0;font-size:15.5px;color:var(--muted);}
+‎  .chev{color:var(--accent);font-size:23.5px;}
+‎
+‎  label{display:block;font-size:15.5px;font-weight:600;margin:16px 0 6px;color:var(--ink);}
+‎  label.first{margin-top:0;}
+‎  .hint{font-size:14px;color:var(--muted);margin-top:-3px;margin-bottom:6px;font-weight:400;}
+‎  input[type=text],input[type=date],textarea,select{
+‎    width:100%;
+‎    border:1px solid var(--line);
+‎    border-radius:8px;
+‎    padding:10px 12px;
+‎    font-size:17.5px;
+‎    font-family:inherit;
+‎    background:#f8fafc;
+‎    color:var(--ink);
+‎  }
+‎  textarea{min-height:64px;resize:vertical;}
+‎  input:focus,textarea:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px;}
+‎  input::placeholder,textarea::placeholder{color:#94a3b8;opacity:1;}
+‎
+‎  .choice-row{display:flex;flex-wrap:wrap;gap:8px;}
+‎  .choice{
+‎    border:1px solid var(--line);
+‎    border-radius:20px;
+‎    padding:8px 14px;
+‎    font-size:15.5px;
+‎    background:#f8fafc;
+‎    cursor:pointer;
+‎    user-select:none;
+‎  }
+‎  .choice.selected{background:var(--accent);color:white;border-color:var(--accent);}
+‎  .choice.risk-selected{background:var(--risk);color:white;border-color:var(--risk);}
+‎
+‎  .risk-banner{
+‎    background:var(--risk-bg);
+‎    border:1px solid #fecaca;
+‎    border-radius:8px;
+‎    padding:10px 12px;
+‎    font-size:15.5px;
+‎    color:var(--risk);
+‎    margin-bottom:14px;
+‎    display:none;
+‎  }
+‎  .risk-banner.show{display:block;}
+‎
+‎  .section-title{
+‎    font-size:14px;text-transform:none;color:var(--accent-dark);
+‎    font-weight:600;margin:22px 0 4px;
+‎    border-bottom:1px solid var(--line);padding-bottom:6px;
+‎  }
+‎  .section-title.first{margin-top:4px;}
+‎
+‎  button{
+‎    font-family:inherit;font-size:16.5px;font-weight:600;
+‎    border-radius:8px;border:1px solid transparent;
+‎    padding:11px 16px;cursor:pointer;
+‎  }
+‎  .btn-primary{background:var(--accent);color:white;width:100%;margin-top:20px;}
+‎  .btn-primary:active{background:var(--accent-dark);}
+‎  .btn-secondary{background:transparent;border:1px solid var(--line);color:var(--ink);width:100%;margin-top:8px;}
+‎  .btn-ghost{background:transparent;color:var(--accent);border:none;padding:6px 0;font-size:15.5px;}
+‎
+‎  .back-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;cursor:pointer;}
+‎  .back-row span.arrow{font-size:21px;color:var(--accent);}
+‎  .back-row span.label{font-size:16.5px;color:var(--muted);}
+‎
+‎  .summary pre{
+‎    white-space:pre-wrap;font-family:'IBM Plex Sans',sans-serif;
+‎    font-size:16px;line-height:1.6;background:#f8fafc;
+‎    border:1px solid var(--line);border-radius:8px;padding:14px;
+‎  }
+‎
+‎  nav.tabbar{
+‎    position:fixed;bottom:0;left:0;right:0;
+‎    background:var(--panel);border-top:1px solid var(--line);
+‎    display:flex;justify-content:space-around;
+‎    padding:8px 6px calc(8px + env(safe-area-inset-bottom));
+‎  }
+‎  nav.tabbar .tab{
+‎    display:flex;flex-direction:column;align-items:center;gap:2px;
+‎    font-size:13px;color:var(--muted);cursor:pointer;flex:1;
+‎  }
+‎  nav.tabbar .tab .dot{width:6px;height:6px;border-radius:50%;background:transparent;margin-bottom:2px;}
+‎  nav.tabbar .tab.active{color:var(--accent-dark);font-weight:600;}
+‎  nav.tabbar .tab.active .dot{background:var(--accent);}
+‎
+‎  .subtype-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;}
+‎  .subtype{
+‎    border:1px solid var(--line);border-radius:20px;padding:9px 14px;
+‎    font-size:15.5px;background:#f8fafc;cursor:pointer;
+‎  }
+‎  .subtype.selected{background:var(--accent-dark);color:white;border-color:var(--accent-dark);}
+‎
+‎  .check-item{
+‎    display:flex;align-items:flex-start;gap:10px;
+‎    padding:11px 0;border-bottom:1px solid var(--line);
+‎    cursor:pointer;
+‎  }
+‎  .check-item:last-child{border-bottom:none;}
+‎  .check-item input{margin-top:3px;width:18px;height:18px;accent-color:var(--accent);flex-shrink:0;}
+‎  .check-item.redflag input{accent-color:var(--risk);}
+‎  .check-item span{font-size:16.5px;line-height:1.4;}
+‎
+‎  .verdict{
+‎    margin-top:18px;border-radius:10px;padding:14px 16px;
+‎    font-size:16.5px;font-weight:600;line-height:1.5;
+‎  }
+‎  .verdict.v-organic{background:var(--risk-bg);color:var(--risk);border:1px solid #fecaca;}
+‎  .verdict.v-functional{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0;}
+‎  .verdict.v-unclear{background:#f8fafc;color:#475569;border:1px solid #cbd5e1;}
+‎  .verdict.v-orange{background:#fffbeb;color:#92400e;border:1px solid #fde68a;}
+‎  
+‎  /* Nouvelles couleurs spécifiques pour l'EPDS (Vert, Jaune, Rouge) */
+‎  .verdict.v-green { background: #E6F4EA; color: #137333; border: 1px solid #CEEAD6; }
+‎  .verdict.v-yellow { background: #FEF7E0; color: #B06000; border: 1px solid #FAD680; }
+‎  .verdict.v-red { background: #FCE8E6; color: #C5221F; border: 1px solid #FAD2CF; }
+‎
+‎  .wizard-progress{font-size:14px;color:var(--muted);margin-bottom:6px;font-weight:600;}
+‎  .wizard-track{height:4px;background:var(--line);border-radius:2px;margin-bottom:18px;overflow:hidden;}
+‎  .wizard-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .25s ease;}
+‎  .wizard-nav{display:flex;gap:10px;margin-top:22px;}
+‎  .wizard-nav button{margin-top:0;flex:1;}
+‎
+‎  .vital-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+‎  .vital-grid label{margin:0 0 4px;}
+‎
+‎  .physio-row{
+‎    border:1px solid var(--line);border-radius:8px;
+‎    padding:12px;margin-bottom:10px;
+‎  }
+‎  .physio-row .physio-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+‎  .physio-row .physio-head strong{font-size:16.5px;}
+‎
+‎  html[dir="rtl"] body{font-family:'IBM Plex Sans Arabic','IBM Plex Sans',sans-serif;}
+‎  html[dir="rtl"] .back-row .arrow{transform:scaleX(-1);}
+‎  html[dir="rtl"] .chev{transform:scaleX(-1);}
+‎  html[dir="rtl"] .module-list .card{border-left:none;border-right:3px solid var(--accent-light);}
+‎  html[dir="rtl"] .brand{flex-direction:row-reverse;}
+‎
+‎  @media print{
+‎    nav.tabbar,.topbar,.btn-primary,.btn-secondary,.back-row{display:none !important;}
+‎    .screen{display:block !important;}
+‎    body{background:white;}
+‎  }
+‎</style>
+‎</head>
+‎<body>
+‎
+‎<div class="topbar">
+‎  <div class="brand">
+‎    <div class="brand-mark">PT</div>
+‎    <h1 data-i18n="appName">Psychiatry Toolkit</h1>
+‎  </div>
+‎  <div style="display:flex;align-items:center;gap:10px;">
+‎    <div id="langSwitch" style="display:flex;gap:4px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:2px;">
+‎      <button type="button" data-lang="fr" onclick="setLang('fr')" style="border:none;background:transparent;font-size:11px;font-weight:600;padding:4px 7px;border-radius:6px;cursor:pointer;">FR</button>
+‎      <button type="button" data-lang="en" onclick="setLang('en')" style="border:none;background:transparent;font-size:11px;font-weight:600;padding:4px 7px;border-radius:6px;cursor:pointer;">EN</button>
+‎      <button type="button" data-lang="ar" onclick="setLang('ar')" style="border:none;background:transparent;font-size:11px;font-weight:600;padding:4px 7px;border-radius:6px;cursor:pointer;">ع</button>
+‎    </div>
+‎    <span id="patientTag" data-i18n="newRecord">nouveau dossier</span>
+‎  </div>
+‎</div>
+‎
+‎<div id="app">
+‎
+‎  <!-- DASHBOARD -->
+‎  <div class="screen active" id="screen-home">
+‎    <div class="section-title first" data-i18n="sessionIdTitle">Identifiant de séance (non nominatif recommandé)</div>
+‎    <div class="card">
+‎      <label class="first" data-i18n="refLabel">Référence dossier</label>
+‎      <div class="hint" data-i18n="refHint">Utilisez un code, pas le nom complet du patient.</div>
+‎      <input type="text" id="patientRef" placeholder="ex : PT-0231">
+‎    </div>
+‎
+‎    <div class="section-title" data-i18n="emergenciesTitle">Urgences psychiatriques</div>
+‎    <div class="module-list">
+‎      <div class="card" onclick="goTo('urgence')" style="border-color:#fecaca;">
+‎        <div><h3 data-i18n="emergenciesCardTitle">🔴 Urgences psychiatriques</h3><p data-i18n="emergenciesCardDesc">Accès direct — psychose puerpérale, refus alimentaire, sevrage, etc.</p></div>
+‎        <span class="chev">›</span>
+‎      </div>
+‎    </div>
+‎
+‎    <div class="section-title" data-i18n="modulesTitle">Modules</div>
+‎    <div class="module-list">
+‎      <div class="card" onclick="goTo('risk')">
+‎        <div><h3 data-i18n="riskCardTitle">Évaluation du risque suicidaire</h3><p data-i18n="riskCardDesc">Idéation, intention, plan, moyens, facteurs</p></div>
+‎        <span class="chev">›</span>
+‎      </div>
+‎      <div class="card" onclick="goTo('mse')">
+‎        <div><h3 data-i18n="mseCardTitle">Examen de l'état mental (MSE)</h3><p data-i18n="mseCardDesc">Présentation, discours, pensée, cognition</p></div>
+‎        <span class="chev">›</span>
+‎      </div>
+‎      <div class="card" onclick="goTo('safety')">
+‎        <div><h3 data-i18n="safetyCardTitle">Plan de sécurité</h3><p data-i18n="safetyCardDesc">Signaux d'alerte, stratégies, contacts</p></div>
+‎        <span class="chev">›</span>
+‎      </div>
+‎      <div class="card" onclick="goTo('epds')">
+‎        <div><h3 data-i18n="epdsCardTitle">Dépistage de dépression post-partum</h3><p data-i18n="epdsCardDesc">Échelle d'Édimbourg — Évaluation avec barème et code couleur</p></div>
+‎        <span class="chev">›</span>
+‎      </div>
+‎      <div class="card" onclick="goTo('soma')">
+‎        <div><h3 data-i18n="somaCardTitle">Manifestations somatiques de l'anxiété</h3><p data-i18n="somaCardDesc">Côlon irritable, palpitations, dermatose, céphalées, vertiges, fatigue, anxiété générale</p></div>
+‎        <span class="chev">›</span>
+‎      </div>
+‎      <div class="card" onclick="goTo('summary')">
+‎        <div><h3 data-i18n="summaryCardTitle">Résumé & export</h3><p data-i18n="summaryCardDesc">Compiler les modules en note clinique</p></div>
+‎        <span class="chev">›</span>
+‎      </div>
+‎    </div>
+‎
+‎    <p style="text-align:center;font-size:13px;color:var(--muted);margin-top:28px;">
+‎      © 2026 Dr TOUAHRI Mohammed<br>
+‎      mohammedtouahri42@gmail.com · +213 777 122 805
+‎    </p>
+‎  </div>
+‎
+‎  <!-- RISK MODULE -->
+‎  <div class="screen" id="screen-risk">
+‎    <div class="back-row" onclick="goTo('home')"><span class="arrow">‹</span><span class="label" data-i18n="home">Accueil</span></div>
+‎    <h2 data-i18n="riskCardTitle">Évaluation du risque suicidaire</h2>
+‎    <div class="risk-banner" id="riskBanner" data-i18n="riskBannerText">Éléments à haut risque cochés — envisager une évaluation immédiate et la sécurisation des moyens létaux, conformément à votre protocole local.</div>
+‎
+‎    <label class="first" data-i18n="riskIdeationLabel">Idéation suicidaire actuelle</label>
+‎    <div class="choice-row" data-group="ideation">
+‎      <div class="choice" data-value="none" data-i18n="risk_ideation_none">Absente</div>
+‎      <div class="choice" data-value="passive" data-i18n="risk_ideation_passive">Passive</div>
+‎      <div class="choice" data-value="active_noplan" data-risk="true" data-i18n="risk_ideation_active_noplan">Active sans plan</div>
+‎      <div class="choice" data-value="active_plan" data-risk="true" data-i18n="risk_ideation_active_plan">Active avec plan</div>
+‎    </div>
+‎
+‎    <label data-i18n="riskIntentionLabel">Intention</label>
+‎    <div class="choice-row" data-group="intention">
+‎      <div class="choice" data-value="none" data-i18n="risk_intention_none">Aucune</div>
+‎      <div class="choice" data-value="ambivalent" data-i18n="risk_intention_ambivalent">Ambivalente</div>
+‎      <div class="choice" data-value="present" data-risk="true" data-i18n="risk_intention_present">Présente</div>
+‎    </div>
+‎
+‎    <label data-i18n="riskMeansLabel">Accès à des moyens létaux</label>
+‎    <div class="choice-row" data-group="means">
+‎      <div class="choice" data-value="no" data-i18n="risk_means_no">Non</div>
+‎      <div class="choice" data-value="possible" data-i18n="risk_means_possible">Possible</div>
+‎      <div class="choice" data-value="direct" data-risk="true" data-i18n="risk_means_direct">Direct</div>
+‎    </div>
+‎
+‎    <label data-i18n="riskHistoryLabel">Antécédents de tentative</label>
+‎    <div class="choice-row" data-group="history">
+‎      <div class="choice" data-value="none" data-i18n="risk_history_none">Aucun</div>
+‎      <div class="choice" data-value="old" data-i18n="risk_history_old">Ancien (&gt;1 an)</div>
+‎      <div class="choice" data-value="recent" data-risk="true" data-i18n="risk_history_recent">Récent (&lt;1 an)</div>
+‎    </div>
+‎
+‎    <label class="first" data-i18n="riskProtectiveLabel">Facteurs protecteurs identifiés</label>
+‎    <div class="choice-row" id="riskProtectiveChips">
+‎      <div class="choice" data-value="entourage" data-i18n="risk_protective_entourage">Entourage présent</div>
+‎      <div class="choice" data-value="enfants" data-i18n="risk_protective_enfants">Enfants à charge</div>
+‎      <div class="choice" data-value="croyances" data-i18n="risk_protective_croyances">Croyances religieuses</div>
+‎      <div class="choice" data-value="suivi" data-i18n="risk_protective_suivi">Suivi psychiatrique en cours</div>
+‎      <div class="choice" data-value="projets" data-i18n="risk_protective_projets">Projets à court terme</div>
+‎      <div class="choice" data-value="aucun" data-i18n="risk_protective_aucun">Aucun identifié</div>
+‎    </div>
+‎    <label data-i18n="wPrecisions">Précisions</label>
+‎    <textarea id="riskProtective" data-i18n-placeholder="detailsPlaceholder" placeholder="Détails"></textarea>
+‎
+‎    <label data-i18n="riskNotesLabel">Notes cliniques</label>
+‎    <textarea id="riskNotes" data-i18n-placeholder="freeObservations" placeholder="Observations libres"></textarea>
+‎
+‎    <button class="btn-primary" onclick="goTo('home')" data-i18n="saveReturn">Enregistrer et revenir</button>
+‎  </div>
+‎
+‎  <!-- MSE MODULE -->
+‎  <div class="screen" id="screen-mse">
+‎    <div class="back-row" onclick="goTo('home')"><span class="arrow">‹</span><span class="label" data-i18n="home">Accueil</span></div>
+‎    <h2 data-i18n="mseCardTitleFull">Examen de l'état mental</h2>
+‎
+‎    <label class="first" data-i18n="mseAppearanceLabel">Présentation générale</label>
+‎    <textarea id="mseAppearance" data-i18n-placeholder="mseAppearancePh" placeholder="Hygiène, contact visuel, comportement"></textarea>
+‎
+‎    <label data-i18n="mseSpeechLabel">Discours</label>
+‎    <div class="choice-row" data-group="speech">
+‎      <div class="choice" data-value="normal" data-i18n="mse_speech_normal">Normal</div>
+‎      <div class="choice" data-value="slow" data-i18n="mse_speech_slow">Ralenti</div>
+‎      <div class="choice" data-value="fast" data-i18n="mse_speech_fast">Accéléré</div>
+‎      <div class="choice" data-value="poor" data-i18n="mse_speech_poor">Pauvre</div>
+‎    </div>
+‎
+‎    <label data-i18n="mseMoodLabel">Humeur rapportée</label>
+‎    <input type="text" id="mseMood" data-i18n-placeholder="mseMoodPh" placeholder="Dans les mots du patient">
+‎
+‎    <label data-i18n="mseAffectLabel">Affect observé</label>
+‎    <div class="choice-row" data-group="affect">
+‎      <div class="choice" data-value="congruent" data-i18n="mse_affect_congruent">Congruent</div>
+‎      <div class="choice" data-value="incongruent" data-i18n="mse_affect_incongruent">Incongruent</div>
+‎      <div class="choice" data-value="blunted" data-i18n="mse_affect_blunted">Émoussé</div>
+‎      <div class="choice" data-value="labile" data-i18n="mse_affect_labile">Labile</div>
+‎    </div>
+‎
+‎    <label data-i18n="mseThoughtLabel">Cours de la pensée</label>
+‎    <textarea id="mseThought" data-i18n-placeholder="mseThoughtPh" placeholder="Cohérent, tangentiel, coq-à-l'âne, fuite des idées…"></textarea>
+‎
+‎    <label data-i18n="mseContentLabel">Contenu de la pensée</label>
+‎    <textarea id="mseContent" data-i18n-placeholder="mseContentPh" placeholder="Idées délirantes, obsessions, préoccupations"></textarea>
+‎
+‎    <label data-i18n="msePerceptionLabel">Perceptions</label>
+‎    <div class="choice-row" data-group="perception">
+‎      <div class="choice" data-value="none" data-i18n="mse_perception_none">Aucune anomalie</div>
+‎      <div class="choice" data-value="hallucinations" data-i18n="mse_perception_hallucinations">Hallucinations rapportées</div>
+‎    </div>
+‎
+‎    <label data-i18n="mseCognitionLabel">Cognition / orientation</label>
+‎    <textarea id="mseCognition" data-i18n-placeholder="mseCognitionPh" placeholder="Temps, espace, personne, attention, mémoire"></textarea>
+‎
+‎    <label data-i18n="mseInsightLabel">Insight et jugement</label>
+‎    <textarea id="mseInsight" plac
+
+
+Created: 23 September 2026, 11:00:02 AM
